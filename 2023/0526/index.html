@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+
+  <title>Amorphous</title>
+  <link rel="icon" href="https://img.icons8.com/ios-filled/50/000000/data-matrix-code.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <meta name="keywords" content=>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0">
+<style>
+  body {
+  margin: 0;
+}
+html,
+body,
+.container {
+  height: 101%;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  letter-spacing: 0.01rem;
+}
+.container {
+  max-width: 840px;
+  margin: 0 auto;
+}
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+.home {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+.home .info {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.home .info .logo {
+  font-size: 2.5em;
+  font-weight: bold;
+}
+.home .info .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.home .info .sns {
+  margin: 1em auto;
+}
+.home .info .sns a {
+  width: 55px;
+  color: #999;
+  display: inline-block;
+}
+.home .info .sns a:hover {
+  color: #000;
+}
+.home .info footer {
+  border: 0;
+  color: #000;
+  padding: 0;
+}
+.page {
+  margin: 0 20px;
+  margin-bottom: 2em;
+}
+.page p {
+  line-height: 1.5em;
+}
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Tomorrow Comment */
+.highlight .comment,
+.highlight .quote {
+  color: #408090;
+}
+/* Tomorrow Red */
+.highlight .variable,
+.highlight .template-variable,
+.highlight .tag,
+.highlight .name,
+.highlight .selector-id,
+.highlight .selector-class,
+.highlight .regexp,
+.highlight .deletion {
+  color: #c82829;
+}
+/* Tomorrow Orange */
+.highlight .number,
+.highlight .built_in,
+.highlight .builtin-name,
+.highlight .literal,
+.highlight .type,
+.highlight .params,
+.highlight .meta,
+.highlight .link {
+  color: #f5871f;
+}
+/* Tomorrow Yellow */
+.highlight .attribute {
+  color: #eab700;
+}
+/* Tomorrow Green */
+.highlight .string,
+.highlight .symbol,
+.highlight .bullet,
+.highlight .addition {
+  color: #718c00;
+}
+/* Tomorrow Blue */
+.highlight .title,
+.highlight .section {
+  color: #4271ae;
+}
+/* Tomorrow Purple */
+.highlight .keyword,
+.highlight .selector-tag {
+  color: #8959a8;
+}
+.highlight {
+  display: block;
+  overflow-x: auto;
+  background: #fff;
+  color: #000;
+  padding: 0.5em;
+}
+.highlight .emphasis {
+  font-style: italic;
+}
+.highlight .strong {
+  font-weight: bold;
+}
+.header {
+  margin-bottom: -0.6em;
+  padding: 0 20px;
+}
+.header .blog-title {
+  font-size: 2.5em;
+  text-align: center;
+  padding-top: 0.5em;
+}
+.header .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.header .menu {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+}
+.header .menu .menu-item {
+  margin: 0 15px 0 0;
+  padding: 3px 0 3px 0;
+  float: inherit;
+  display: inline-block;
+}
+.header .menu .menu-item-link {
+  color: #999;
+}
+.header .menu .menu-item-link:hover {
+  color: #000;
+}
+.post {
+  padding: 0 20px;
+  margin-bottom: 1.5em;
+}
+.post img {
+  max-width: 100%;
+}
+.post table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.post table td,
+.post table th {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+.post hr {
+  margin: 1.5em 0;
+}
+.post .post-content {
+  text-align: justify;
+}
+.post .post-content a {
+  border-bottom: 1px solid;
+}
+.post .post-content a:hover {
+  border-bottom: 1px solid;
+}
+.post .post-content ul,
+.post .post-content ol {
+  text-align: left;
+}
+.post .post-content ul li,
+.post .post-content ol li {
+  padding: 0px;
+  line-height: 1.5em;
+}
+.post figure {
+  margin: 0;
+}
+.post figure table {
+  width: 100%;
+}
+.post figure table .code {
+  border: 0;
+  padding: 0;
+}
+.post figure .gutter {
+  display: none;
+}
+.post blockquote {
+  margin: 0;
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+.post pre {
+  margin: 0;
+  padding: 0.5em 1.5em;
+  overflow: auto;
+  font-size: 110%;
+  line-height: 1.5;
+  background-color: #f7f7f7;
+}
+.post code {
+  font-family: Monaco, source code pro, Inconsolata, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  font-size: 1.02em;
+  background: #eee;
+  margin: 5px;
+  padding: 0 5px;
+}
+.post p {
+  line-height: 1.5em;
+}
+.post .toc {
+  padding: 1em;
+  list-style-type: square;
+}
+.post .toc-child {
+  list-style: square;
+}
+.post .post-footer {
+  line-height: 1;
+  min-height: 1em;
+}
+.post .post-footer .top {
+  float: right;
+  color: #666;
+}
+.post .post-footer .top:hover {
+  color: #000;
+}
+.post .post-footer .post-tag-list {
+  display: inline-block;
+  padding: 0;
+  margin: 0 0 0.5em 0;
+  color: #999;
+}
+.post .post-footer .post-tag-list .post-tag-list-item {
+  display: inline-block;
+  margin: 0 1em 0 0;
+}
+.post .post-footer .post-tag-list .post-tag-list-item a {
+  font-size: 85%;
+}
+.post .post-footer .post-tag-list .post-tag-list-item:before {
+  content: '#';
+}
+.archive {
+  padding: 0 20px;
+  margin-bottom: 1em;
+}
+.archive .post-archive {
+  list-style: none;
+  padding: 0;
+}
+.archive .post-archive .post-item {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.archive .post-archive .post-item .post-date {
+  font-size: 80%;
+  color: #aaa;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+}
+@media screen and (max-width: 425px) {
+  .archive .post-archive .post-item .post-date {
+    float: none;
+    margin-left: 0.5em;
+    font-size: 90%;
+    color: #999;
+  }
+}
+.archive .post-archive .post-item .post-title {
+/* border-bottom: 1px dotted; */
+  text-decoration: none;
+}
+.archive .post-archive .post-item .post-title:hover {
+  border-bottom: 1px solid;
+}
+.page-nav {
+  padding: 0 20px;
+}
+.page-nav .prev,
+.page-nav .page-number {
+  padding: 10px 20px 10px 0;
+}
+.page-nav .next {
+  float: right;
+}
+.page-nav a {
+  color: #777;
+}
+.page-nav a:hover {
+  color: #000;
+}
+footer {
+  margin: 0.5em 20px 0 20px;
+  border-top: 3px double #ccc;
+  padding: 1em 0 1em 0;
+  font-size: 80%;
+  color: #888;
+}
+footer .author {
+  color: #000;
+}
+
+</style>
+</head>
+
+  <body>
+    <div class="container">
+      <header class="header">
+  <div class="blog-title">
+    <a href="/" class="logo">Amorphous</a>
+    <div class="subtitle"></div>
+  </div>
+  <nav class="navbar">
+    <ul class="menu">
+
+        <li class="menu-item">
+          <a href="/" class="menu-item-link">Home</a>
+        </li>
+
+        <li class="menu-item">
+          <a href="/about" class="menu-item-link">About</a>
+        </li>
+
+    </ul>
+  </nav>
+</header>
+
+<article class="post">
+  <div class="post-title">
+    <h1 class="article-title">Neural Networks (General)</h1>
+  </div>
+
+
+  <div class="post-content">
+    <h3>A Simple Example</h3>
+    <p>Consider the problem of classifying points on a Cartesian plane with a 1-layer neural network. Here, the inputs are fed into one fully connected hidden layer. An intermediate layer of the neural network serves to create a new representation of the data until eventually the final layer will draw a hyperplane to linearly seperate the data. </p>
+    <p>Let us assign the intermediate layer a tanh activation function. This means that the input is first subjected to a linear transformation from being multiplied by a weight matrix W followed by a linear translation from adding a bias vector b. The tanh activation function is then applied element-wise to each value of the transformed input.</p>
+    <p>The purpose of the tanh function is to map the input values to a range of -1 to 1 and is defined as tanh(x) = (exp(x) - exp(-x)) / (exp(x) + exp(-x)). The exponential function introduces nonlinearity to the linear transformation, allowing the network to learn positive and negative patterns. Let's break down what this activation function is doing. The exponential function returns only positive values, so for positive inputs exp(x) will be a larger value than exp(-x), resulting in a positive difference and for negative inputs exp(-x) will be larger resulting in a negative difference. Thus, the numerator captures the sign and magnitude of the input. The denominator sums these exponentials which serves as a normalization factor that accounts for the magnitude of the input value. In the case where the input tends towards positive or negative infinity, exp(x) or exp(-x) dominate respectively while the other term tends to 0 and the denominator is approximately equal to the numerator, causing the output of the tanh function to approach the boundaries of the function's range, which is -1 to 1.</p>
+    <p>This layer's operation can be summarized: <code>tanh(Wx+b)</code></p>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+      <img src="images/1d-nn.png" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+      <figcaption style="text-align: center;">Single Layer Neural Network</figcaption>
+    </div>
+    <h3>More Complicated Neural Networks</h3>
+    <p>As the number of layers increases in a neural network, the network has the ability to learn and create new data representations at each layer. This process continues until the data becomes separable into distinct classes. This can be visualized by considering the activation levels of neurons in each layer as axes in a plot, where the data becomes increasingly separated by class at each layer. If the data is not linearly separable by the final layer, the network will not be an accurate classifier. An interesting visualization of this can be found <a href="https://cs.stanford.edu/people/karpathy/convnetjs/demo/classify2d.html" target="_blank">here</a> using ConvNetJS.</p>
+    <p>Each layer transforms space, but the space is topologically intact (i.e. space is not cut, broken, or folded). This means the fundamental structure and connectivity of the data are preserved which is important because if a set of data points were connected (all points reachable from one another) before going through a layer, it will remain connected after the layer's transformation, and vice versa. </p>
+    <p>The term "homeomorphisms" is used to describe these transformations that preserve topological properties. A homeomorphism is a mathematical concept that refers to a bijective function (a function that has a unique mapping from one set to another) that is continuous both ways. For example, multiplying by W (which can be reversed with its inverse, assuming W is non-singular) and adding by b are both homeomorphisms. Activation functions tanh, sigmoid (sigmoid(x) = 1 / (1 + e^(-x)), range 0 to 1), and softplus (softplus(x) = ln(1 + e^x), range 0 to pos. inf) are continuous functions with inverses point-wise. ReLU (ReLU(x) = max(0, x), range 0 to pos. inf) on the other hand does not have an inverse since it maps negative input values to 0 and keeps positive input values unchanged. </p>
+    <h3>Word Embeddings</h3>
+    <p>An example of a trained network involves generating sentences from scratch. A word embedding is a high dimensional vector assigned to each word and they are stored in a look-up table T. During the sentence generation process, each word is passed through the lookup table T to obtain its corresponding vector representation which is then passed to a module M to predict the validity of the sentence. To avoid the problem of only allowing a fixed number of inputs, a module A can take two words or phrases and merge them. This latter process is called a recursive neural network since the output of one module is the input for another similar module.</p>
+    <h3>Backpropagation</h3>
+    <p>Backpropagation is an optimized method to reduce the loss function over time. It calculates the gradient of the loss function with respect to the neural network's weights and heads backwards through the network to find the partial derivative of the errors with respect to the weights. It then uses these weights to reduce error by using gradient descent. The gradient descent algorithm adjusts the weights and biases by taking small steps in the opposite direction of the gradients, thus gradually reducing the loss</p>
+    <h3>Recurrent Neural Networks</h3>
+    <p>The feedforward neural network described above has no memory of the input it recieves. In contrast, a RNN has short-term memory since it applies weights to the current and also the previous input. </p>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+      <img src="images/rnn.png" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+      <figcaption style="text-align: center;">Recurrent Neural Network</figcaption>
+    </div>
+    <p>A timestep in the RNN can be summarized as follows:</p>
+<code>A<sub>i</sub> = tanh(W<sub>A<sub>i-1</sub></sub>A<sub>i-1</sub> + W<sub>x<sub>i</sub></sub>x<sub>i</sub> + b<sub>A<sub>i</sub></sub>)</code> and <code>h<sub>i</sub> = tanh(W<sub>A<sub>i</sub></sub>A<sub>i</sub> + b<sub>h<sub>i</sub></sub>)</code>.
+<p>Different types of RNNs exist, such as One-to-One (one A module and one x input produce one h output), One-to-many (one A module and one x input produce an h output, which is used as input for the next A module), Many-to-one (one A and one x input produce a module output, used with another x as input to eventually produce a final h output), and Many-to-many (one A and one x are used as input to produce a module and an output h, while the output module and a new x are used as the next input).</p>
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+  <img src="images/rnn_scheme.jpeg" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+  <figcaption style="text-align: center;">RNN Schemes</figcaption>
+</div>
+<p>The loss function is defined based on the loss at every time step (here L2 loss is used as an example):</p>
+<p>\[ Loss = \sum_{t=1}^{{T}_{i}} (y_{t} - \hat{y}_{t})^2 \]</p>
+<p>RNNs often encounter two intriguing phenomena: the vanishing and exploding gradient. These phenomena arise from the inherent difficulty in capturing long-term dependencies within the network. The cause of these issues lies in the multiplicative gradients (during backpropagation gradients pass through the recurrent connections, they are multiplied with each othe), which can undergo exponential decay or growth as the number of layers increases, posing significant challenges in effectively capturing and retaining information over extended sequences. In practice, this is accounted for by thresholding the gradient, known as gradient clipping. This works because it prevents unstable updates and prevents layers with large gradients from dominating the learning process. </p>
+<p>LSTMs (Long Short Term Memory networks) are a type of RNN that support learning long-term dependencies. In an LSTM, there is a cell state for every module, which is a horizontal line that runs across the entire architecture. Each module contains gates that open variable amounts to modify this value before it is passed onto the next module. The first step in an LSTM is the sigmoid layer which looks at h<sub>i-1</sub> and x<sub>i</sub> and outputs a 1 to keep a value in the cell state and a 0 to discard it (e.g. given a sentence, decide whether to discard the subject). Next, a sigmoid layer determines which values to update and a tanh layer generates new cell state values that can be added to the state (e.g. add the gender of another word in the sentence).</p>
+<p>This process can be summarized (S represents the cell state, f is first sigmoid output, i and \(\hat{S}\) are the second sigmoid and tanh outputs respectively): <code>S<sub>i</sub> = f<sub>t</sub>*S<sub>t-1</sub> + i<sub>t</sub>*S_hat</code>.</p>
+<p>Neural Turing Machines are RNNs with an external memory component inspired by Turing machines. NTMs consist of a controller, a memory, and read/write heads. The controller, typically an RNN, processes input data and interacts with the memory by reading from and writing to it using the heads. The memory acts as a flexible storage system, allowing for read and write operations through content-based or location-based addressing. During operation, the the controller gives a query vector and each memory entry is scored for similarity with the query. These scores are converted into a distribution using softmax. After interpolating attention from the previous timestep, the attention is convolved with a shift filter (allows the controller to move its focus). Then, the attention distribution is sharpened which is fed to the read or write operation. </p> 
+<h3>Convolutional Neural Networks</h3>  
+<p>A convolutional neural network is designed for visual data and is inspired by the visual cortex in animals, where neurons in the brain respond to specific receptive fields in the visual field. CNNs have a convolutional, pooling, and fully connected layer. During the scanning process of the input, the convolution layer utilizes filters to carry out convolution operations, taking into account the input's dimensions. The hyperparameters of this layer consist of the filter size and the stride. The outcome of this process, referred to as the feature map or activation map. The filter volume is FxFxC, where F is the filter size and C is the number of input channels, which performs convolutions on an input of size NxNxC (where N is the input size) and outputs a feature map of size OxOxK (where O is the output size and K is the number of filters, commonly 2*C). The stride is the number of pixels the filter moves per operation (commonly equal to F). Padding is considered when deciding if the filter should see the input end-to-end, otherwise the last convolution is dropped if the dimensions don't match. Given these hyperparameters, the output size is defined as \[O = \frac{{N - F + P_{\text{begin}} + P_{\text{end}}}}{S} + 1\] where N is the input size, F is the filter size, and P is the amount of padding (total size of white space padding before/after image).</p> 
+<p>The pooling layer applies a downsampling operation. There are two common types: max pooling which selects the maximum value of the current view and average pooling which averages the values of the current view. The receptive field at a layer k is found by squaring \(R_k\), which is calculated:\[R_k = 1 + \sum_{j=1}^{k} (F_j - 1) \prod_{i=0}^{j-1} S_i\] The fully connected layer flattens the input and feeds each cell into all neurons, which optimizes class score. </p> 
+<p>You Only Look Once (YOLO) is a real-time object detection model which divides the image into NxN grid, then for each grid cell runs a CNN that calculates k times: \[y = \left[ p_c, b_x, b_y, b_h, b_w, c_1, c_2, \ldots, c_p, \ldots \right]^T \in \mathbb{R}^{G \times G \times k \times (5+p)}\] where \(p_c\) is the probability of detecting an object, each b is the bounding box, and each c is an indicator used to represent the detection of p classes, and k is the number of detected bounding boxes. To eliminate overlapping bounding boxes, a non-max suppression algorithm is used, which takes as input a set of bounding boxes and their confidences, sorts the boxes by descending confidence, selects the highest confidence box and measures overlap via Intersection over Union (IoU), and eliminates boxes over the IoU threshold.</p>
+<p>In contrast, Region with Convolutional Neural Networks (R-CNN) is a bottom-up approach which  first generates a set of potential bounding box proposals by employing a region proposal algorithm, such as Selective Search. The algorithm does not have any prior knowledge about the objects present in the image; instead, it generates a set of region proposals that cover various regions of interest in the image. Each proposal is independently forwarded through a CNN to extract features from the proposed region.</p>
+<h3>Various Visual Architectures</h3>
+<p>Neural Style Transfer is a technique which combines the content of one image with the style of another image to create a new synthesized image. A pre-trained CNN (a large dataset for object recognition tasks and has learned to extract meaningful features from images) is used to extract the content and style features from the original and style images. A loss function is defined to measure the difference between the content features of the synthesized image and the content image, as well as the difference between the style features of the synthesized image and the style image. The content cost is written: \[\text{Content Loss}= \frac{1}{2} \lVert a_{[i]}(C) - a_{[i]}(G) \rVert^2\] where \(a_i\) denotes the activation of layer i and C and G are the content and generated images respectively. The style matrix which describes how correlated channels c and c' are is written (image dimensions = hxwxl): \[G_{cc'}[l] = \sum_{i=1}^{h[l]} \sum_{j=1}^{w[l]} a_{ijc}[l] a_{ijc'}[l]\] Correspondingly, the style cost which compares the generated image G and the style image S is written: \[\text{Style Loss} = \frac{1}{(2hwl)^2} \sum_{c,c'=1}^{l} (G_{cc'}^{[i](S)} - G_{cc'}^{[i](G)})^2\] The overall cost can be written: \[Loss = \alpha * \text{Content Loss} + \beta * \text{Style Loss}\] where a higher alpha can prioritize the content and a higher beta will prioritize the style in the generated image. </p>
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+  <img src="images/neural_transfer.png" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+  <figcaption style="text-align: center;">Neural Transfer Example</figcaption>
+</div>
+<p>Generative adversarial networks (GANs) take in random noise input and produce synthetic data samples that resemble the real data from a given training set (aim of the generator). The discriminator trained on real and fake data acts as a binary classifier that aims to differentiate between the real and synthetic data. In training, they are pitted against each other which provides adversarial training and implicit supervision (does not require labeled data but explores solution space) which improves performance of both the generator and discriminator.</p>
+<p>Residual Nets (ResNets) addresses the problem of vanishing gradients by introducing residual connections which allow the network to learn residual mappings (the difference between the desired output and the current output at a given layer) in contrast to propagating raw feature maps which improves performance of deeper networks. Each residual block consists of two or more convolutional layers, followed by batch normalization and rectified linear unit (ReLU) activations. Instead of directly passing the output of one layer to the next, a shortcut connection is introduced that bypasses one or more layers. This shortcut connection allows the network to learn the residual mapping by adding the shortcut connection's output to the output of the convolutional layers. </p>   
+<div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+  <img src="images/resnet.png" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+  <figcaption style="text-align: center;">ResNet Architecture</figcaption>
+</div>
+   
+   <script>
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    </script>
+
+    <figure class="highlight plain">
+      <table>
+
+
+          <td class="code">
+            <pre>
+              <span class="line"></span>
+              </pre>
+          </td>
+
+        </table>
+    </figure>
+  <div class="post-footer">
+
+
+    <a href="#top" class="top">Back to Top</a>
+  </div>
+</article>
+
+<footer>
+  <span class="author">
+  </span>
+</footer>
+
+
+    </div>
+    
+  </body>
+</html>
