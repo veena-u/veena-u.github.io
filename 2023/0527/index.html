@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+
+  <title>Amorphous</title>
+  <link rel="icon" href="https://img.icons8.com/ios-filled/50/000000/data-matrix-code.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <meta name="keywords" content=>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0">
+<style>
+  body {
+  margin: 0;
+}
+html,
+body,
+.container {
+  height: 101%;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  letter-spacing: 0.01rem;
+}
+.container {
+  max-width: 840px;
+  margin: 0 auto;
+}
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+.home {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+.home .info {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.home .info .logo {
+  font-size: 2.5em;
+  font-weight: bold;
+}
+.home .info .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.home .info .sns {
+  margin: 1em auto;
+}
+.home .info .sns a {
+  width: 55px;
+  color: #999;
+  display: inline-block;
+}
+.home .info .sns a:hover {
+  color: #000;
+}
+.home .info footer {
+  border: 0;
+  color: #000;
+  padding: 0;
+}
+.page {
+  margin: 0 20px;
+  margin-bottom: 2em;
+}
+.page p {
+  line-height: 1.5em;
+}
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Tomorrow Comment */
+.highlight .comment,
+.highlight .quote {
+  color: #408090;
+}
+/* Tomorrow Red */
+.highlight .variable,
+.highlight .template-variable,
+.highlight .tag,
+.highlight .name,
+.highlight .selector-id,
+.highlight .selector-class,
+.highlight .regexp,
+.highlight .deletion {
+  color: #c82829;
+}
+/* Tomorrow Orange */
+.highlight .number,
+.highlight .built_in,
+.highlight .builtin-name,
+.highlight .literal,
+.highlight .type,
+.highlight .params,
+.highlight .meta,
+.highlight .link {
+  color: #f5871f;
+}
+/* Tomorrow Yellow */
+.highlight .attribute {
+  color: #eab700;
+}
+/* Tomorrow Green */
+.highlight .string,
+.highlight .symbol,
+.highlight .bullet,
+.highlight .addition {
+  color: #718c00;
+}
+/* Tomorrow Blue */
+.highlight .title,
+.highlight .section {
+  color: #4271ae;
+}
+/* Tomorrow Purple */
+.highlight .keyword,
+.highlight .selector-tag {
+  color: #8959a8;
+}
+.highlight {
+  display: block;
+  overflow-x: auto;
+  background: #fff;
+  color: #000;
+  padding: 0.5em;
+}
+.highlight .emphasis {
+  font-style: italic;
+}
+.highlight .strong {
+  font-weight: bold;
+}
+.header {
+  margin-bottom: -0.6em;
+  padding: 0 20px;
+}
+.header .blog-title {
+  font-size: 2.5em;
+  text-align: center;
+  padding-top: 0.5em;
+}
+.header .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.header .menu {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+}
+.header .menu .menu-item {
+  margin: 0 15px 0 0;
+  padding: 3px 0 3px 0;
+  float: inherit;
+  display: inline-block;
+}
+.header .menu .menu-item-link {
+  color: #999;
+}
+.header .menu .menu-item-link:hover {
+  color: #000;
+}
+.post {
+  padding: 0 20px;
+  margin-bottom: 1.5em;
+}
+.post img {
+  max-width: 100%;
+}
+.post table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.post table td,
+.post table th {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+.post hr {
+  margin: 1.5em 0;
+}
+.post .post-content {
+  text-align: justify;
+}
+.post .post-content a {
+  border-bottom: 1px solid;
+}
+.post .post-content a:hover {
+  border-bottom: 1px solid;
+}
+.post .post-content ul,
+.post .post-content ol {
+  text-align: left;
+}
+.post .post-content ul li,
+.post .post-content ol li {
+  padding: 0px;
+  line-height: 1.5em;
+}
+.post figure {
+  margin: 0;
+}
+.post figure table {
+  width: 100%;
+}
+.post figure table .code {
+  border: 0;
+  padding: 0;
+}
+.post figure .gutter {
+  display: none;
+}
+.post blockquote {
+  margin: 0;
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+.post pre {
+  margin: 0;
+  padding: 0.5em 1.5em;
+  overflow: auto;
+  font-size: 110%;
+  line-height: 1.5;
+  background-color: #f7f7f7;
+}
+.post code {
+  font-family: Monaco, source code pro, Inconsolata, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  font-size: 1.02em;
+  background: #eee;
+  margin: 5px;
+  padding: 0 5px;
+}
+.post p {
+  line-height: 1.5em;
+}
+.post .toc {
+  padding: 1em;
+  list-style-type: square;
+}
+.post .toc-child {
+  list-style: square;
+}
+.post .post-footer {
+  line-height: 1;
+  min-height: 1em;
+}
+.post .post-footer .top {
+  float: right;
+  color: #666;
+}
+.post .post-footer .top:hover {
+  color: #000;
+}
+.post .post-footer .post-tag-list {
+  display: inline-block;
+  padding: 0;
+  margin: 0 0 0.5em 0;
+  color: #999;
+}
+.post .post-footer .post-tag-list .post-tag-list-item {
+  display: inline-block;
+  margin: 0 1em 0 0;
+}
+.post .post-footer .post-tag-list .post-tag-list-item a {
+  font-size: 85%;
+}
+.post .post-footer .post-tag-list .post-tag-list-item:before {
+  content: '#';
+}
+.archive {
+  padding: 0 20px;
+  margin-bottom: 1em;
+}
+.archive .post-archive {
+  list-style: none;
+  padding: 0;
+}
+.archive .post-archive .post-item {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.archive .post-archive .post-item .post-date {
+  font-size: 80%;
+  color: #aaa;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+}
+@media screen and (max-width: 425px) {
+  .archive .post-archive .post-item .post-date {
+    float: none;
+    margin-left: 0.5em;
+    font-size: 90%;
+    color: #999;
+  }
+}
+.archive .post-archive .post-item .post-title {
+/* border-bottom: 1px dotted; */
+  text-decoration: none;
+}
+.archive .post-archive .post-item .post-title:hover {
+  border-bottom: 1px solid;
+}
+.page-nav {
+  padding: 0 20px;
+}
+.page-nav .prev,
+.page-nav .page-number {
+  padding: 10px 20px 10px 0;
+}
+.page-nav .next {
+  float: right;
+}
+.page-nav a {
+  color: #777;
+}
+.page-nav a:hover {
+  color: #000;
+}
+footer {
+  margin: 0.5em 20px 0 20px;
+  border-top: 3px double #ccc;
+  padding: 1em 0 1em 0;
+  font-size: 80%;
+  color: #888;
+}
+footer .author {
+  color: #000;
+}
+
+</style>
+</head>
+
+  <body>
+    <div class="container">
+      <header class="header">
+  <div class="blog-title">
+    <a href="/" class="logo">Amorphous</a>
+    <div class="subtitle"></div>
+  </div>
+  <nav class="navbar">
+    <ul class="menu">
+
+        <li class="menu-item">
+          <a href="/" class="menu-item-link">Home</a>
+        </li>
+
+        <li class="menu-item">
+          <a href="/about" class="menu-item-link">About</a>
+        </li>
+
+    </ul>
+  </nav>
+</header>
+
+<article class="post">
+  <div class="post-title">
+    <h1 class="article-title">Visualizing Neural Networks</h1>
+  </div>
+
+
+  <div class="post-content">
+    <h3>An Intuitive Explaination of Convolutions (continued from CNNs)</h3>
+    <p>A 1D-convolution is expressed: \[(f \ast g)(c) = \sum_{a+b=c} f(a) \cdot g(b)\] Let's break this down with an example. Imagine you have a ball and it is dropped multiple times. Based on symmetry, if we know the probability of the ball landing at a certain distance from where it started (denoted as x), we can also determine the probability of it starting at x distance from where it landed. Given the ball lands at "c", but we would like to know if it dropped at "a" in the previous drop. Imagine we have two probability distributions, one representing the ball's position during the first drop (denoted as f), and the other representing the probability of the ball being at a certain position if it lands at position "c" during the second drop (denoted as g). We calculate the contribution of each intermediate position by multiplying the corresponding probabilities from distributions f and g together. We then sum up these contributions from all the intermediate positions to obtain a single value representing the combined probability at the evaluated position. In simpler terms, evaluating the convolution involves looking at each intermediate position and determining how much the distributions f and g contribute to the final result. When the distributions align (while holding the g distribution still), the convolution shows a peak, indicating a higher probability of the ball being in the previous position. </p>
+    <p>This concept extends to the visual environment as well. Similarly, this can be thought of as holding one function still and sliding the other on top, multiplying and adding. In image processing, a small sized kernel is convolved across the entire image and computes a a new pixel as a weighted sum of the pixels it floats over. To detect edges, we can take -1 and 1 on adjacent pixels with 0 everywhere else in the kernel (subtracting side-by-side pixels, so an edge shows when they are different). </p>
+    <h3>Deciding What to Visualize</h3>
+    <p>There are three main components to a neural network worth considering: activations, weights, and attributions. The activations correspond to each neuron and can loosely be described as what the network detected. The weights can be viewed as the compiled result of the activations, measuring how the network changes the input from one layer to the next. Attributions are not explicitly in the network, but it measures how one neuron influenced a later neuron, trying to establish a causal relationship. </p>
+    <p>One technique to establish a meaningful pattern in a network's weights is one-sided NMF. Weight banding refers to a phenomenon observed in certain models, such as non-negative matrix factorization (NMF), where the learned weights or factors exhibit a pattern of concentrated values. Specifically, weight banding refers to the situation where the weights tend to cluster or form distinct bands along one dimension. This can be visually represented as sharp peaks or spikes in the weight distribution.</p>
+    <p>Considering that there are indirect interactions (i.e. residual network, the output of one neuron can pass through the additive residual stream), extended weights which are the result of multiplying adjacent weight matrices can be used. If two layers interact linearly, the expanded weights will return a true linear map, while layers which interact non-linearly return the expected value of the gradient up to a constant factor. This method which involves visualizing the weights at each spatial position and interpreting them collectively, can be particularly valuable in understanding neural networks with "bottleneck layers." Bottleneck layers are network layers designed to reduce the number of channels or dimensions, often implemented within a branch of the network. For example, by analyzing the connections and visualizing the weights in the wider layer preceding the bottleneck, we can gain insights into how the information is transformed and propagated through the network. </p>
+    <h3>Circuits in Neural Networks</h3>
+    <p>A neural network is composed of numerous interconnected neurons organized into layers, and the flow of information through these interconnected pathways forms circuits. Normally, these pathways indicate a set of tightly linked features and the weights between them. </p>
+    <p>Interpretability in neural networks has always been important, so researchers may want a “interpretability benchmark” in the future, though it does remain difficult to make robust statements about the behavior of holistic neural networks, although interpreting circuits may offer an advantage in this regard. They can robustly be held to a hypothesis (in visual systems, if a circuit is used to detect ears, a change in weights should change the performance of the network). </p>
+   
+   <script>
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    </script>
+
+    <figure class="highlight plain">
+      <table>
+
+
+          <td class="code">
+            <pre>
+              <span class="line"></span>
+              </pre>
+          </td>
+
+        </table>
+    </figure>
+  <div class="post-footer">
+
+
+    <a href="#top" class="top">Back to Top</a>
+  </div>
+</article>
+
+<footer>
+  <span class="author">
+  </span>
+</footer>
+
+
+    </div>
+    
+  </body>
+</html>
