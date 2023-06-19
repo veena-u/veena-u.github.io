@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+
+<html>
+
+  <!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML async></script>
+
+  <script src=https://polyfill.io/v3/polyfill.min.js?features=es6></script>
+
+  <script src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js></script>
+
+ 
+
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+
+ 
+
+  <title>Amorphous</title>
+
+  <link rel="icon" href=https://img.icons8.com/ios-filled/50/000000/data-matrix-code.png type="image/x-icon">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+ 
+
+  <meta name="keywords" content=>
+
+ 
+
+<link rel="stylesheet" href="/css/style.css">
+
+ 
+
+<meta name="generator" content="Hexo 5.4.0">
+
+<style>
+
+  body {
+
+  margin: 0;
+
+}
+
+html,
+
+body,
+
+.container {
+
+  height: 101%;
+
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+
+  letter-spacing: 0.01rem;
+
+}
+
+.container {
+
+  max-width: 840px;
+
+  margin: 0 auto;
+
+}
+
+.center {
+
+  display: block;
+
+  margin-left: auto;
+
+  margin-right: auto;
+
+  width: 50%;
+
+}
+
+a {
+
+  color: #000;
+
+  text-decoration: none;
+
+}
+
+.home {
+
+  display: table;
+
+  width: 100%;
+
+  height: 100%;
+
+}
+
+.home .info {
+
+  display: table-cell;
+
+  vertical-align: middle;
+
+  text-align: center;
+
+}
+
+.home .info .logo {
+
+  font-size: 2.5em;
+
+  font-weight: bold;
+
+}
+
+.home .info .subtitle {
+
+  font-size: 14px;
+
+  color: #808080;
+
+}
+
+.home .info .sns {
+
+  margin: 1em auto;
+
+}
+
+.home .info .sns a {
+
+  width: 55px;
+
+  color: #999;
+
+  display: inline-block;
+
+}
+
+.home .info .sns a:hover {
+
+  color: #000;
+
+}
+
+.home .info footer {
+
+  border: 0;
+
+  color: #000;
+
+  padding: 0;
+
+}
+
+.page {
+
+  margin: 0 20px;
+
+  margin-bottom: 2em;
+
+}
+
+.page p {
+
+  line-height: 1.5em;
+
+}
+
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+
+/* Tomorrow Comment */
+
+.highlight .comment,
+
+.highlight .quote {
+
+  color: #408090;
+
+}
+
+/* Tomorrow Red */
+
+.highlight .variable,
+
+.highlight .template-variable,
+
+.highlight .tag,
+
+.highlight .name,
+
+.highlight .selector-id,
+
+.highlight .selector-class,
+
+.highlight .regexp,
+
+.highlight .deletion {
+
+  color: #c82829;
+
+}
+
+/* Tomorrow Orange */
+
+.highlight .number,
+
+.highlight .built_in,
+
+.highlight .builtin-name,
+
+.highlight .literal,
+
+.highlight .type,
+
+.highlight .params,
+
+.highlight .meta,
+
+.highlight .link {
+
+  color: #f5871f;
+
+}
+
+/* Tomorrow Yellow */
+
+.highlight .attribute {
+
+  color: #eab700;
+
+}
+
+/* Tomorrow Green */
+
+.highlight .string,
+
+.highlight .symbol,
+
+.highlight .bullet,
+
+.highlight .addition {
+
+  color: #718c00;
+
+}
+
+/* Tomorrow Blue */
+
+.highlight .title,
+
+.highlight .section {
+
+  color: #4271ae;
+
+}
+
+/* Tomorrow Purple */
+
+.highlight .keyword,
+
+.highlight .selector-tag {
+
+  color: #8959a8;
+
+}
+
+.highlight {
+
+  display: block;
+
+  overflow-x: auto;
+
+  background: #fff;
+
+  color: #000;
+
+  padding: 0.5em;
+
+}
+
+.highlight .emphasis {
+
+  font-style: italic;
+
+}
+
+.highlight .strong {
+
+  font-weight: bold;
+
+}
+
+.header {
+
+  margin-bottom: -0.6em;
+
+  padding: 0 20px;
+
+}
+
+.header .blog-title {
+
+  font-size: 2.5em;
+
+  text-align: center;
+
+  padding-top: 0.5em;
+
+}
+
+.header .subtitle {
+
+  font-size: 14px;
+
+  color: #808080;
+
+}
+
+.header .menu {
+
+  margin: 0;
+
+  padding: 0;
+
+  border-top: 1px solid #ccc;
+
+  margin-top: 20px;
+
+}
+
+.header .menu .menu-item {
+
+  margin: 0 15px 0 0;
+
+  padding: 3px 0 3px 0;
+
+  float: inherit;
+
+  display: inline-block;
+
+}
+
+.header .menu .menu-item-link {
+
+  color: #999;
+
+}
+
+.header .menu .menu-item-link:hover {
+
+  color: #000;
+
+}
+
+.post {
+
+  padding: 0 20px;
+
+  margin-bottom: 1.5em;
+
+}
+
+.post img {
+
+  max-width: 100%;
+
+}
+
+.post table {
+
+  border-collapse: collapse;
+
+  border-spacing: 0;
+
+}
+
+.post table td,
+
+.post table th {
+
+  padding: 6px 13px;
+
+  border: 1px solid #dfe2e5;
+
+}
+
+.post hr {
+
+  margin: 1.5em 0;
+
+}
+
+.post .post-content {
+
+  text-align: justify;
+
+}
+
+.post .post-content a {
+
+  border-bottom: 1px solid;
+
+}
+
+.post .post-content a:hover {
+
+  border-bottom: 1px solid;
+
+}
+
+.post .post-content ul,
+
+.post .post-content ol {
+
+  text-align: left;
+
+}
+
+.post .post-content ul li,
+
+.post .post-content ol li {
+
+  padding: 0px;
+
+  line-height: 1.5em;
+
+}
+
+.post figure {
+
+  margin: 0;
+
+}
+
+.post figure table {
+
+  width: 100%;
+
+}
+
+.post figure table .code {
+
+  border: 0;
+
+  padding: 0;
+
+}
+
+.post figure .gutter {
+
+  display: none;
+
+}
+
+.post blockquote {
+
+  margin: 0;
+
+  padding: 0 15px;
+
+  color: #777;
+
+  border-left: 4px solid #ddd;
+
+}
+
+.post pre {
+
+  margin: 0;
+
+  padding: 0.5em 1.5em;
+
+  overflow: auto;
+
+  font-size: 110%;
+
+  line-height: 1.5;
+
+  background-color: #f7f7f7;
+
+}
+
+.post code {
+
+  font-family: Monaco, source code pro, Inconsolata, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+
+  font-size: 1.02em;
+
+  background: #eee;
+
+  margin: 5px;
+
+  padding: 0 5px;
+
+}
+
+.post p {
+
+  line-height: 1.5em;
+
+}
+
+.post .toc {
+
+  padding: 1em;
+
+  list-style-type: square;
+
+}
+
+.post .toc-child {
+
+  list-style: square;
+
+}
+
+.post .post-footer {
+
+  line-height: 1;
+
+  min-height: 1em;
+
+}
+
+.post .post-footer .top {
+
+  float: right;
+
+  color: #666;
+
+}
+
+.post .post-footer .top:hover {
+
+  color: #000;
+
+}
+
+.post .post-footer .post-tag-list {
+
+  display: inline-block;
+
+  padding: 0;
+
+  margin: 0 0 0.5em 0;
+
+  color: #999;
+
+}
+
+.post .post-footer .post-tag-list .post-tag-list-item {
+
+  display: inline-block;
+
+  margin: 0 1em 0 0;
+
+}
+
+.post .post-footer .post-tag-list .post-tag-list-item a {
+
+  font-size: 85%;
+
+}
+
+.post .post-footer .post-tag-list .post-tag-list-item:before {
+
+  content: '#';
+
+}
+
+.archive {
+
+  padding: 0 20px;
+
+  margin-bottom: 1em;
+
+}
+
+.archive .post-archive {
+
+  list-style: none;
+
+  padding: 0;
+
+}
+
+.archive .post-archive .post-item {
+
+  margin: 10px 0;
+
+  line-height: 1.5;
+
+}
+
+.archive .post-archive .post-item .post-date {
+
+  font-size: 80%;
+
+  color: #aaa;
+
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+
+}
+
+@media screen and (max-width: 425px) {
+
+  .archive .post-archive .post-item .post-date {
+
+    float: none;
+
+    margin-left: 0.5em;
+
+    font-size: 90%;
+
+    color: #999;
+
+  }
+
+}
+
+.archive .post-archive .post-item .post-title {
+
+/* border-bottom: 1px dotted; */
+
+  text-decoration: none;
+
+}
+
+.archive .post-archive .post-item .post-title:hover {
+
+  border-bottom: 1px solid;
+
+}
+
+.page-nav {
+
+  padding: 0 20px;
+
+}
+
+.page-nav .prev,
+
+.page-nav .page-number {
+
+  padding: 10px 20px 10px 0;
+
+}
+
+.page-nav .next {
+
+  float: right;
+
+}
+
+.page-nav a {
+
+  color: #777;
+
+}
+
+.page-nav a:hover {
+
+  color: #000;
+
+}
+
+footer {
+
+  margin: 0.5em 20px 0 20px;
+
+  border-top: 3px double #ccc;
+
+  padding: 1em 0 1em 0;
+
+  font-size: 80%;
+
+  color: #888;
+
+}
+
+footer .author {
+
+  color: #000;
+
+}
+
+ 
+
+</style>
+
+</head>
+
+ 
+
+  <body>
+
+    <div class="container">
+
+      <header class="header">
+
+  <div class="blog-title">
+
+    <a href="/" class="logo">Amorphous</a>
+
+    <div class="subtitle"></div>
+
+  </div>
+
+  <nav class="navbar">
+
+    <ul class="menu">
+
+ 
+
+        <li class="menu-item">
+
+          <a href="/" class="menu-item-link">Home</a>
+
+        </li>
+
+ 
+
+        <li class="menu-item">
+
+          <a href="/about" class="menu-item-link">About</a>
+
+        </li>
+
+ 
+
+    </ul>
+
+  </nav>
+
+</header>
+
+ 
+
+<article class="post">
+
+  <div class="post-title">
+
+    <h1 class="article-title">Probability, Statistics, Linear Algebra, and Calculus Review</h1>
+
+  </div>
+
+ 
+
+  <div class="post-content">
+
+    <h3>Probability</h3>
+
+    <p>Sample space (\(S\)): The set of all possible outcomes of an experiment</p>
+
+    <p>Event (\(E\)): A subset of the sample space </p>
+
+    <p>Intersection: \(A \cap B\), set of outcomes overlapping events A and B</p>
+
+    <p>Union: \(A \cup B\), set of outcomes across A and B</p>
+
+    <p>Axioms of probability: </p>
+
+    <ol><li>\(0 \leq P(E) \leq 1\)</li>
+
+        <li>\(P(S) = 1\)</li>
+
+        <li>for a set of mutually exclusive events (i.e. \(E_i \cap E_j\) = \(\emptyset\)): \( \bigcup_{i=1}^{n} E_i = \sum_{i=1}^{n} P(E_i) \)</li>
+
+    </ol>
+
+    <p>Permutation: given n objects, the number of arrangements of r objects in a given order. \(P(n,r) = \frac{n!}{(n-r)!}\) </p>
+
+    <p>Combination: given n objects, the number of arrangements of r objects in any order. \(C(n,r) = \frac{P(n,r)}{r!} = \frac{n!}{r!(n-r)!}\) </p>
+
+    <p>Bayes Rule: for events A and B such that \(P(B) > 0 \), \(P(A|B) = \frac{P(A \cap B)}{P(B)} = \frac{P(B|A)P(A)}{P(B)}\) since \(P(A \cap B) = P(A)P(B|A) = P(B)P(B|A)\)</p>
+
+    <p>For a partition \({A_i}\) and any event \(B\), then \(P(B) = \sum_{i=1}^{n} P(A_i)P(B|A_i)\) (sum up probabilities comprising B across different sample spaces) and applying Bayes, \(P(A_k|B) = \frac{P(B|A_k)P(A_k)}{\sum_{i=1}^{n}P(B|A_i)P(A_i)}\)</p>
+
+    <p>Independence: A and B are independent iff: \(P(A \cap B) = P(A)P(B)\)</p>
+
+    <p>Random Variable: a function that maps every element in a sample space to a real line.</p>
+
+    <p>Cumulative distribution function (CDF): A monotonically non-decreasing function \(F(x) = P(X \leq x)\). As x approaches negative infinity, F(x) equals 0 and as it approaches positive infinity, F(x) equals 1. Similarly, \( P(a< X \leq b) = F(b) - F(a)\) </p>
+
+    <p>Probability density function (PDF): A function f that denotes the probability that X takes on a value between two values the random variable can take, not the probability of that event. </p>
+
+ 
+
+    <table>
+
+        <tr>
+
+          <td>&nbsp;</td>
+
+          <td>Discrete Case (i.e. outcome of a coin flip)</td>
+
+          <td>Continuous Case (i.e. temperature of a room)</td>
+
+        </tr>
+
+        <tr>
+
+          <td>CDF \(F\)</td>
+
+          <td>\(F(x) = \sum P(X = x_{i})\)</td>
+
+          <td>\(F(x) = \int_{-\infty}^{x} f(y)dy\)</td>
+
+        </tr>
+
+        <tr>
+
+          <td>PDF \(f\)</td>
+
+          <td>[Probability Mass Function]: \(f(x_{j}) = P(X = x_{j}) = p(x_{j})\)</td>
+
+          <td>\(f(x) = \frac{dF}{dx}\)</td>
+
+        </tr>
+
+        <tr>
+
+          <td>Properties</td>
+
+          <td>\(0\leq f(x_{j}) \leq 1\) and \(\sum_{j} f(x_{j}) =1\)</td>
+
+          <td>\(f(x) \geq 0\) and \(\int_{-\infty}^{\infty} f(x)dx =1\)</td>
+
+        </tr>
+
+      </table>
+
+ 
+
+      <p>Expected value (\(E[X]\)): Known as the mean or first moment. Found by averaging the results of an event infinitely many times.</p>
+
+      <p>Sample Mean: An estimate the true mean by finding the average of a random sample, defined \(\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i\). </p>
+
+      <P>Central Limit Theorem: Given a random sample with mean \(\mu\) and variance \(\sigma^2\), then \(\bar{X} \underset{n \to +\infty}{\sim} N(\mu, \frac{\sigma}{\sqrt{n}})\)</P>
+
+      <p>k-th moment (\(E[X^{k}]\)): Expected value of \(X^{k}\) after infinitely many trials. Here, \(X^{k}\) as \(g(X)\) is used in the general form of the expected value formula. It can also be calculated with the formula \(E[X^k] = i^k \left[\frac{\partial^k \psi}{\partial \omega^k}\right]_{\omega=0}\) </p>
+
+      <p>Variance (\(Var(X)\) or \(\sigma^2\)): Measure of the spread of a distribution function. \(Var(X) = E[(X-E[X])^2] = E[X^2]-E[X]^2\)</p>
+
+      <p>Sample variance: Used to estimate true variance and given by \(\hat{\sigma}^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2\)</p>
+
+      <p>Chi-Squared relation: \(\frac{\hat{\sigma}^2(n-1)}{\sigma^2} \sim \chi^2_{n-1}\)</p>
+
+      <p>Standard deviation (\(\sigma\)): Measure of spread, compatible with units of actual random variable.</p>
+
+      <p>Characteristic function (\(\psi(\omega)\)): The expected value of the complex exponential function \(e^{iX\omega}\).</p> 
+      <table>
+        <tr>
+          <td>&nbsp;</td>
+          <td>Discrete Case</td>
+          <td>Continuous Case</td>
+        </tr>
+        <tr>
+          <td>\(E[X]\)</td>
+          <td>\(\sum_{i=1}^{n} x_i f(x_i)\)</td>
+          <td>\(\int_{-\infty}^{+\infty} xf(x)dx\)</td>
+        </tr>
+        <tr>
+          <td>\(E[g(X)]\)</td>
+          <td>\(\sum_{i=1}^{n} g(x_i) f(x_i)\)</td>
+          <td>\(\int_{-\infty}^{+\infty} g(x)f(x)dx\)</td>
+        </tr>
+        <tr>
+          <td>\(E[X^k]\)</td>
+          <td>\(\sum_{i=1}^{n} x_{ik} f(x_i)\)</td>
+          <td>\(\int_{-\infty}^{+\infty} x_k f(x)dx\)</td>
+        </tr>
+        <tr>
+          <td>\(\psi(\omega)\)</td>
+          <td>\(\sum_{i=1}^{n} f(x_i)e^{i\omega x_i}\)</td>
+          <td>\(\int_{-\infty}^{+\infty} f(x)e^{i\omega x} dx\)</td>
+        </tr>
+      </table>
+
+      <p>Transformation of RVs: If X and Y are related by some function and \(f_X\) and \(f_Y\) denote the PDF of the RVs respectively,the PDF of the transformed random variable Y is given by \(f_Y(y) = f_X(x) \left|\frac{{dy}}{{dx}}\right|\), where the absolute value of the derivative of the transformation function that relates the random variables X and Y. It quantifies the rate of change in Y with respect to X.</p> 
+      <p>Chebyshev's inequality: For a RV X with expected value \(\mu\), and standard deviation \(\sigma > 0, k>0\): \(P(|X-\mu| \geq k\sigma) \leq \frac{1}{k^2}\). This says the probability of X deviating from its mean by a certain number of standard deviations (k\(\sigma\)) or more is bounded by an upper limit equal to the reciprocal of the square of that number.</p>
+      <!-- <p>Markov's inequality: </p> -->
+      <table>
+        <tr>
+          <td>&nbsp;</td>
+          <td>X∼Bin(n,p)</td>
+          <td>X∼Poisson(\(\mu\))</td>
+          <td>Uniform(a, b)</td>
+          <td>Normal(\(\mu, \sigma\))</td>
+          <td>Exp(\(\lambda\))</td>
+        </tr>
+        <tr>
+          <td>\(P(X=x)\)</td>
+          <td>\({n \choose x} p^x q^{n-x}\)</td>
+          <td>\(\frac{\mu^x}{x!}e^{-\mu}\)</td>
+          <td>\(\frac{1}{b-a}\)</td>
+          <td>\(\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x-\mu)^2}{2\sigma^2}}\)</td>
+          <td>\(\lambda e^{-\lambda x}\)</td>
+        </tr>
+        <tr>
+          <td>\(E[X]\)</td>
+          <td>\(np\)</td>
+          <td>\(\mu\)</td>
+          <td>\(\frac{a+b}{2}\)</td>
+          <td>\(\mu\)</td>
+          <td>\(\frac{1}{\lambda}\)</td>
+        </tr>
+        <tr>
+          <td>\(Var(X)\)</td>
+          <td>\(npq\)</td>
+          <td>\(\mu\)</td>
+          <td>\(\frac{(b-a)^2}{12}\)</td>
+          <td>\(\sigma^2\)</td>
+          <td>\(\frac{1}{\lambda^2}\)</td>
+        </tr>
+      </table>
+      <!-- <p>Joint probability density function (\(f_{XY}\)): </p>
+      <p>Marginal density: </p>
+      <p>Cumulative function: </p> -->
+      <table>
+        <tr>
+          <td>&nbsp;</td>
+          <td>Discrete Case</td>
+          <td>Continuous Case</td>
+        </tr>
+        <tr>
+          <td>Joint PDF</td>
+          <td>\(f_{XY}(x_i, y_j) = P(X = x_i \text{ and } Y = y_j)\)</td>
+          <td>\(f_{XY}(x, y) \Delta x \Delta y = P(x \leq X \leq x+\Delta x \text{ and } y \leq Y \leq y+\Delta y)\)</td>
+        </tr>
+        <tr>
+          <td>Marginal density</td>
+          <td>\(f_X(x_i) = \sum_j f_{XY}(x_i, y_j)\)</td>
+          <td>\(f_X(x) = \int_{-\infty}^{+\infty} f_{XY}(x, y) dy\)</td>
+        </tr>
+        <tr>
+          <td>Cumulative function</td>
+          <td>\(F_{XY}(x, y) = \sum_{x_i \leq x} \sum_{y_j \leq y} f_{XY}(x_i, y_j)\)</td>
+          <td>\(F_{XY}(x, y) = \int_{-\infty}^x \int_{-\infty}^y f_{XY}(x', y') \, dx' \, dy'\)</td>
+        </tr>
+        <tr>
+          <td>Moments of joint distributions \(E[X^{p}Y^{q}]\)</td>
+          <td>\(\sum \sum x_i^p y_j^q f(x_i, y_j)\)</td>
+          <td>\(\int_{-\infty}^{+\infty} \int_{-\infty}^{+\infty} x^p y^q f(x,y) \, dy \, dx \)</td>
+        </tr>
+      </table>
+
+      <p>Conditional density \(f_{XY}\): \(f_{X|Y}(x) = \frac{f_Y(y)}{f_{XY}(x, y)}\)</p>
+      <p>Independence of two RVs: Two random variables X and Y are said to be independent iff \(P(X, Y) = P(X)P(Y) \quad f_{XY}(x, y) = f_X(x) f_Y(y)\)</p>
+      <p>Covariance: \(Cov(X, Y) \triangleq \sigma_{XY}^2 = E[(X-\mu_X)(Y-\mu_Y)] = E[XY] - \mu_X \mu_Y\)</p>
+      <p>Correlation: \(Cor(X, Y) = \frac{\sigma_{XY}}{\sigma_X \sigma_Y} = \frac{\sigma_{XY}^2}{\sigma_X^2 \sigma_Y^2}\). \(Cor(X, Y)\) lies in [-1, 1] and is 0 if the RVs are independent.</p>
+
+
+      <h3>Statistics</h3>
+      <p>Confidence Level: A confidence interval with confidence level \(1-\alpha\) means \(1-\alpha\) of the time, the true value is in the confidence interval. To find \(CI_{1-\alpha}\) such that \(\text{Pr}(\sigma^2 \in CI_{1-\alpha}) = 1 - \alpha\), calculate the sample variance \(s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2\) then normalize it by finding \(K = \frac{\sigma^2}{s^2(n-1)} \sim \chi^2_{n-1}\), which lies in \(\chi^2\) distribution with n-1 degrees of freedom, then use a look-up table to find \(P(\chi^2_{1} \leq K \leq \chi^2_{2}) = 1 - \alpha\), so in total \(CI_{1-\alpha} = [\frac{s^2(n-1)}{\chi^2_{2}} , \frac{s^2(n-1)}{\chi^2_{1}}]\)</p>
+      <p>Type I Error (\(\alpha\)): Probability of rejecting the H0 while the H0 is true ("false positive"), expressed \(\alpha = P(T \in R | H_0 \text{ true})\), where T is the test statistic and R is the rejection region to reject the null hypothesis. </p>
+      <p>Type II Error (\(\beta\)): Probability of not rejecting H0 while it is not true ("false negative"), expressed \(\beta = P(T \notin R | H_0 \text{ not true})\) </p>
+      <p>P-value: A measure of the strength of evidence against the null hypothesis and quantifies the probability of observing a test statistic as extreme as the one obtained in the sample data. A smaller p-value indicates stronger evidence against the null hypothesis, suggesting that the observed data is unlikely to have occurred by chance alone. </p>  
+      <p>\(\chi^2\) fit (goodness of fit test): Used to assess whether an observed sample of data follows a specific theoretical distribution. The null hypothesis assumes that the observed data follows the specified theoretical distribution. Per bin of data, calculate the expected frequencies  expected if the null hypothesis is true. \(T = \sum_{i=1}^{k} \frac{(Y_i - np_i)^2}{np_i} \quad \text{under } H_0 \sim \chi^2_{df}\) with df = (k-1) - #parameters, where k is the number of bins and n is the total number of samples.</p>
+      <p>Linear modeling: Given \(n\) data points \((x_i, Y_i)\), let \(S_{XY} = \sum_{i=1}^{n}(x_i - \overline{x})(Y_i - \overline{Y}) \quad \text{and} \quad S_{XX} = \sum_{i=1}^{n}(x_i - \overline{x})^2 \quad \text{and} \quad S_{YY} = \sum_{i=1}^{n}(Y_i - \overline{Y})^2\), then estimate coefficients A and B in Y = Ax+B as \(A = \overline{Y} - \frac{S_{XX}}{S_{XY}}\overline{x} \quad \text{and} \quad B = \frac{S_{XY}}{S_{XX}}\)</p>
+      <p>Correlation coefficient: for two RVs X and Y, \(\rho = \frac{{E[(X - \mu_X)(Y - \mu_Y)]}}{{\sqrt{{E[(X - \mu_X)^2]} \cdot {E[(Y - \mu_Y)^2]}}}}\)</p>
+      <p>Fisher transformation z-transform: converts the correlation coefficient into a quantity that approximately follows a normal distribution and is defined \( z = \frac{1}{2} \ln\left(\frac{1 - \rho}{1 + \rho}\right) \)</p>
+      
+      <h3>Linear Algebra and Calculus</h3>
+      <p>Vector-vector multiplication: </p>
+      <p>Inner product: for \(x, y \in \mathbb{R}^n\), \(\mathbf{x}^T \mathbf{y} = \sum_{i=1}^{n} \mathbf{x}_i\mathbf{y}_i \in \mathbb{R}\)</p>
+      <p>Outer product: for \(x \in \mathbb{R}^m\), \(y \in \mathbb{R}^n\), \(\mathbf{x} \mathbf{y}^T = \begin{bmatrix}
+        x_{1}y_{1} & x_{2}y_{1} & \cdots & x_{m}y_{1} \\
+        \vdots & \vdots & \ddots & \vdots \\
+        x_{1}y_{n} & x_{2}y_{n} & \cdots & x_{m}y_{n} \\
+        \end{bmatrix} \in \mathbb{R}^{m \times n}\)</p>
+      <p>Matrix-vector multiplication: for \(\mathbf{A} \in \mathbb{R}^{m \times n}, \quad \mathbf{x} \in \mathbb{R}^{n}\), \(\mathbf{Ax} = \sum_{i=1}^{n} \mathbf{a}_{c, i}x_{i} \in \mathbb{R}^{m}\), where \(\mathbf{a}_{c, i}\) is a vector column of A.</p>
+      <p>Symmetric decomposition: For a symmetric matrix (a square matrix that is equal to its transpose), break the matrix into smaller symmetric rank-one matrix which can be represented as the outer product of a vector with itself, so \( A = \sum_{i=1}^{k} \lambda_i \mathbf{v}_i \mathbf{v}_i^T \), where \(\lambda_i\) represents the eigenvalues of A and \(\mathbf{v}_i\) represents the corresponding eigenvectors. Any matrix A can be broken down into its symmetric and antisymmetric components: \(A = \underbrace{\frac{1}{2}(A + A^T)}_{\text{Symmetric}} + \underbrace{\frac{1}{2}(A - A^T)}_{\text{Antisymmetric}}\)</p>
+      <p>Norm: A norm (\(\| x \|_p = \left( \sum_{i} |x_i|^p \right)^{\frac{1}{p}}\)) on a vector space \(V\) is a function \(\|\cdot\| : V \rightarrow \mathbb{R}\) that satisfies the following properties:</p>
+      <ol><li>Non-negativity: \(\|v\| \geq 0\) for all \(v \in V\), and \(\|v\| = 0\) if and only if \(v = 0\) (the zero vector)</li>
+
+        <li>Homogeneity/Scalar Multiplication: \(\|\alpha v\| = |\alpha| \|v\|\) for all \(v \in V\) and \(\alpha \in \mathbb{R}\) (or the field of scalars)</li>
+
+        <li>Triangle Inequality: \(\|u + v\| \leq \|u\| + \|v\|\) for all \(u, v \in V\)</li>
+
+    </ol>
+    <p>Positive semidefinite matrix (\(\mathbf{A} \succeq 0\)): Matrix \(\mathbf{A} \in \mathbb{R}^{n \times n}\) is PSD if \(\mathbf{A} = \mathbf{A}^T\) and \(\forall \mathbf{x} \in \mathbb{R}^n, \mathbf{x}^T \mathbf{A} \mathbf{x} \geq 0\)</p>
+    <p>Positive definite matrix (\(\mathbf{A} \succ 0\)): A PSD matrix that satisfies for all non-zero vector \(\mathbf{x}\), \(\mathbf{x}^T \mathbf{A} \mathbf{x} > 0\).</p>    
+    <p>Eigenvector, eigenvalue: Given a matrix \(\mathbf{A} \in \mathbb{R}^{n \times n}\), \(\lambda\) is said to be an eigenvalue of \(\mathbf{A}\) if there exists a vector \(\mathbf{z} \in \mathbb{R}^n \setminus \{\mathbf{0}\}\), called an eigenvector, such that we have: \(\mathbf{Az} = \lambda \mathbf{z}\). Intuitively, an eigenvector is a vector that remains in the same direction (up to scaling) when a linear transformation or matrix operation is applied to the matrix. The eigenvalue associated with that eigenvector represents the scaling factor by which the eigenvector is stretched or shrunk under the linear transformation.</p>
+    <p>Spectral Theorem: If \(\mathbf{A}\) is a symmetric matrix, then \(\mathbf{A}\) is diagonalizable by a real orthogonal matrix (a matrix whose transpose is equal to its inverse) \(\mathbf{U} \in \mathbb{R}^{n \times n}\). Let \(\Lambda = \text{diag}(\lambda_1, ..., \lambda_n)\), then \(\mathbf{A} = \mathbf{U} \Lambda \mathbf{U}^T\)</p>    
+    <p>Singular-value decomposition: For a given matrix \(\mathbf{A}\) of dimensions \(m \times n\), the singular-value decomposition (SVD) is a factorization technique that guarantees the existence of \(\mathbf{U}_{m \times m}\) with columns which are orthonormal vectors, \(\Sigma_{m \times n}\) diagonal with singular values in descending order, and \(\mathbf{V}_{n \times n}\) which is an orthogonal matrix, such that:
+
+      \(\mathbf{A} = \mathbf{U} \Sigma \mathbf{V}^T\)</p>
+        
+        
+      <script>
+
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+        MathJax.typesetPromise().then(function (){
+
+            MathJax.typesetPromise(document.getElementById('latex-table'));
+
+        });
+
+    </script>
+
+ 
+
+    <figure class="highlight plain">
+
+      <table>
+
+ 
+
+          <td class="code">
+
+            <pre>
+
+              <span class="line"></span>
+
+              </pre>
+
+          </td>
+
+ 
+
+        </table>
+
+    </figure>
+
+  <div class="post-footer">
+
+ 
+
+    <a href="#top" class="top">Back to Top</a>
+
+  </div>
+
+</article>
+
+ 
+
+<footer>
+
+  <span class="author">
+
+  </span>
+
+</footer>
+
+ 
+
+    </div>
+
+   
+
+  </body>
+
+</html>
+
+ 
+
