@@ -786,7 +786,7 @@ footer .author {
 
     <p>Random Variable: a function that maps every element in a sample space to a real line.</p>
 
-    <p>Cumulative distribution function (CDF): A monotonically non-decreasing function \(F(x) = P(X \leq x)\). As x approaches negative infinity, F(x) equals 0 and as it approaches positive infinity, F(x) equals 1. Similarly, \( P(a< X \leq b) = F(b) - F(a)\) </p>
+    <p>Cumulative distribution function (CDF): A monotonically non-decreasing function \(F(x) = P(X \leq x)\). As x approaches negative infinity, F(x) equals 0 and as it approaches positive infinity, F(x) equals 1. Furthermore, note \( P(a< X \leq b) = F(b) - F(a)\) </p>
 
     <p>Probability density function (PDF): A function f that denotes the probability that X takes on a value between two values the random variable can take, not the probability of that event. </p>
 
@@ -838,7 +838,7 @@ footer .author {
 
  
 
-      <p>Expected value (\(E[X]\)): Known as the mean or first moment. Found by averaging the results of an event infinitely many times.</p>
+      <p>Expected value (\(E[X]\)): Known as the mean or first moment. Found by averaging the results of an event infinitely many times. The linearity of expectation states \(E[f(x) + g(x)] = E[f(x)] + E[g(x)]\) and for a discrete random variable X, \(E[1{X=k}] = P(X=k)\)</p>
 
       <p>Sample Mean: An estimate the true mean by finding the average of a random sample, defined \(\bar{X} = \frac{1}{n} \sum_{i=1}^{n} X_i\). </p>
 
@@ -846,7 +846,7 @@ footer .author {
 
       <p>k-th moment (\(E[X^{k}]\)): Expected value of \(X^{k}\) after infinitely many trials. Here, \(X^{k}\) as \(g(X)\) is used in the general form of the expected value formula. It can also be calculated with the formula \(E[X^k] = i^k \left[\frac{\partial^k \psi}{\partial \omega^k}\right]_{\omega=0}\) </p>
 
-      <p>Variance (\(Var(X)\) or \(\sigma^2\)): Measure of the spread of a distribution function. \(Var(X) = E[(X-E[X])^2] = E[X^2]-E[X]^2\)</p>
+      <p>Variance (\(Var(X)\) or \(\sigma^2\)): Measure of how concentrated the distribution of a RV is around its mean. \(Var(X) = E[(X-E[X])^2] = E[X^2]-E[X]^2\). Note \(Var(aX) = a^2Var(X)\)</p>
 
       <p>Sample variance: Used to estimate true variance and given by \(\hat{\sigma}^2 = \frac{1}{n-1} \sum_{i=1}^{n} (X_i - \bar{X})^2\)</p>
 
@@ -889,14 +889,16 @@ footer .author {
       <table>
         <tr>
           <td>&nbsp;</td>
-          <td>X∼Bin(n,p)</td>
-          <td>X∼Poisson(\(\mu\))</td>
+          <td>X~Bin(n,p)</td>
+          <td>Geo(p)</td>
+          <td>Poisson(\(\mu\))</td>
           <td>Uniform(a, b)</td>
           <td>Normal(\(\mu, \sigma\))</td>
           <td>Exp(\(\lambda\))</td>
         </tr>
         <tr>
           <td>\(P(X=x)\)</td>
+          <td>\(p(1-p)^{k-1})\)</td>
           <td>\({n \choose x} p^x q^{n-x}\)</td>
           <td>\(\frac{\mu^x}{x!}e^{-\mu}\)</td>
           <td>\(\frac{1}{b-a}\)</td>
@@ -906,6 +908,7 @@ footer .author {
         <tr>
           <td>\(E[X]\)</td>
           <td>\(np\)</td>
+          <td>\(\frac{1}{p}\)</td>
           <td>\(\mu\)</td>
           <td>\(\frac{a+b}{2}\)</td>
           <td>\(\mu\)</td>
@@ -914,20 +917,26 @@ footer .author {
         <tr>
           <td>\(Var(X)\)</td>
           <td>\(npq\)</td>
+          <td>\(\frac{1-p}{p^2}\)</td>
           <td>\(\mu\)</td>
           <td>\(\frac{(b-a)^2}{12}\)</td>
           <td>\(\sigma^2\)</td>
           <td>\(\frac{1}{\lambda^2}\)</td>
         </tr>
       </table>
-      <!-- <p>Joint probability density function (\(f_{XY}\)): </p>
-      <p>Marginal density: </p>
-      <p>Cumulative function: </p> -->
+      <!-- <p>Joint probability density function (\(f_{XY}\)): </p> -->
+      <p>Joint cumulative function (\(F_{XY}(x, y)\)): Used to measure the values that X and Y assume simultaneously. Note \(F_{XY}(x, y) = P(X \leq x, Y \leq y)\). It is related to the marginal cumulative distribution functions \(F_X(x)\) and \(F_Y(y)\) by \(F_X(x) =\lim_{y \to \infty} F_{XY}(x, y)dy\) and \(F_Y(y) = \lim_{x \to \infty} F_{XY}(x, y)dx\)</p>
+      <p>Independence: Two RVs are independent iff \(F_{XY} = F_X(x)F_Y(y)\)</p>
       <table>
         <tr>
           <td>&nbsp;</td>
           <td>Discrete Case</td>
           <td>Continuous Case</td>
+        </tr>
+        <tr>
+          <td>Bayes's Rule</td>
+          <td>\(P_{Y|X}(y|x) = \frac{P_{XY}(x, y)}{P_X(x)} = \frac{P_{X|Y}(x|y)P_Y(y)}{\sum_{y_i}P_{X|Y}(x|y_i)P_Y(y_i)}\)</td>
+          <td>\(f_{Y|X}(y|x) = \frac{f_{XY}(x, y)}{f_X(x)} = \frac{f_{X|Y}(x|y)f_Y(y)}{\int_{-\infty}^{\infty} f_{X|Y}(x|y_i)f_Y(y_i)}\)</td>
         </tr>
         <tr>
           <td>Joint PDF</td>
