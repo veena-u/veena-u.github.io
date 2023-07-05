@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+
+  <title>Amorphous</title>
+  <link rel="icon" href="https://img.icons8.com/ios-filled/50/000000/data-matrix-code.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <meta name="keywords" content=>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0">
+<style>
+  body {
+  margin: 0;
+}
+html,
+body,
+.container {
+  height: 101%;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  letter-spacing: 0.01rem;
+}
+.container {
+  max-width: 840px;
+  margin: 0 auto;
+}
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+.home {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+.home .info {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.home .info .logo {
+  font-size: 2.5em;
+  font-weight: bold;
+}
+.home .info .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.home .info .sns {
+  margin: 1em auto;
+}
+.home .info .sns a {
+  width: 55px;
+  color: #999;
+  display: inline-block;
+}
+.home .info .sns a:hover {
+  color: #000;
+}
+.home .info footer {
+  border: 0;
+  color: #000;
+  padding: 0;
+}
+.page {
+  margin: 0 20px;
+  margin-bottom: 2em;
+}
+.page p {
+  line-height: 1.5em;
+}
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Tomorrow Comment */
+.highlight .comment,
+.highlight .quote {
+  color: #408090;
+}
+/* Tomorrow Red */
+.highlight .variable,
+.highlight .template-variable,
+.highlight .tag,
+.highlight .name,
+.highlight .selector-id,
+.highlight .selector-class,
+.highlight .regexp,
+.highlight .deletion {
+  color: #c82829;
+}
+/* Tomorrow Orange */
+.highlight .number,
+.highlight .built_in,
+.highlight .builtin-name,
+.highlight .literal,
+.highlight .type,
+.highlight .params,
+.highlight .meta,
+.highlight .link {
+  color: #f5871f;
+}
+/* Tomorrow Yellow */
+.highlight .attribute {
+  color: #eab700;
+}
+/* Tomorrow Green */
+.highlight .string,
+.highlight .symbol,
+.highlight .bullet,
+.highlight .addition {
+  color: #718c00;
+}
+/* Tomorrow Blue */
+.highlight .title,
+.highlight .section {
+  color: #4271ae;
+}
+/* Tomorrow Purple */
+.highlight .keyword,
+.highlight .selector-tag {
+  color: #8959a8;
+}
+.highlight {
+  display: block;
+  overflow-x: auto;
+  background: #fff;
+  color: #000;
+  padding: 0.5em;
+}
+.highlight .emphasis {
+  font-style: italic;
+}
+.highlight .strong {
+  font-weight: bold;
+}
+.header {
+  margin-bottom: -0.6em;
+  padding: 0 20px;
+}
+.header .blog-title {
+  font-size: 2.5em;
+  text-align: center;
+  padding-top: 0.5em;
+}
+.header .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.header .menu {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+}
+.header .menu .menu-item {
+  margin: 0 15px 0 0;
+  padding: 3px 0 3px 0;
+  float: inherit;
+  display: inline-block;
+}
+.header .menu .menu-item-link {
+  color: #999;
+}
+.header .menu .menu-item-link:hover {
+  color: #000;
+}
+.post {
+  padding: 0 20px;
+  margin-bottom: 1.5em;
+}
+.post img {
+  max-width: 100%;
+}
+.post table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.post table td,
+.post table th {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+.post hr {
+  margin: 1.5em 0;
+}
+.post .post-content {
+  text-align: justify;
+}
+.post .post-content a {
+  border-bottom: 1px solid;
+}
+.post .post-content a:hover {
+  border-bottom: 1px solid;
+}
+.post .post-content ul,
+.post .post-content ol {
+  text-align: left;
+}
+.post .post-content ul li,
+.post .post-content ol li {
+  padding: 0px;
+  line-height: 1.5em;
+}
+.post figure {
+  margin: 0;
+}
+.post figure table {
+  width: 100%;
+}
+.post figure table .code {
+  border: 0;
+  padding: 0;
+}
+.post figure .gutter {
+  display: none;
+}
+.post blockquote {
+  margin: 0;
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+.post pre {
+  margin: 0;
+  padding: 0.5em 1.5em;
+  overflow: auto;
+  font-size: 110%;
+  line-height: 1.5;
+  background-color: #f7f7f7;
+}
+.post code {
+  font-family: Monaco, source code pro, Inconsolata, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  font-size: 1.02em;
+  background: #eee;
+  margin: 5px;
+  padding: 0 5px;
+}
+.post p {
+  line-height: 1.5em;
+}
+.post .toc {
+  padding: 1em;
+  list-style-type: square;
+}
+.post .toc-child {
+  list-style: square;
+}
+.post .post-footer {
+  line-height: 1;
+  min-height: 1em;
+}
+.post .post-footer .top {
+  float: right;
+  color: #666;
+}
+.post .post-footer .top:hover {
+  color: #000;
+}
+.post .post-footer .post-tag-list {
+  display: inline-block;
+  padding: 0;
+  margin: 0 0 0.5em 0;
+  color: #999;
+}
+.post .post-footer .post-tag-list .post-tag-list-item {
+  display: inline-block;
+  margin: 0 1em 0 0;
+}
+.post .post-footer .post-tag-list .post-tag-list-item a {
+  font-size: 85%;
+}
+.post .post-footer .post-tag-list .post-tag-list-item:before {
+  content: '#';
+}
+.archive {
+  padding: 0 20px;
+  margin-bottom: 1em;
+}
+.archive .post-archive {
+  list-style: none;
+  padding: 0;
+}
+.archive .post-archive .post-item {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.archive .post-archive .post-item .post-date {
+  font-size: 80%;
+  color: #aaa;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+}
+@media screen and (max-width: 425px) {
+  .archive .post-archive .post-item .post-date {
+    float: none;
+    margin-left: 0.5em;
+    font-size: 90%;
+    color: #999;
+  }
+}
+.archive .post-archive .post-item .post-title {
+/* border-bottom: 1px dotted; */
+  text-decoration: none;
+}
+.archive .post-archive .post-item .post-title:hover {
+  border-bottom: 1px solid;
+}
+.page-nav {
+  padding: 0 20px;
+}
+.page-nav .prev,
+.page-nav .page-number {
+  padding: 10px 20px 10px 0;
+}
+.page-nav .next {
+  float: right;
+}
+.page-nav a {
+  color: #777;
+}
+.page-nav a:hover {
+  color: #000;
+}
+footer {
+  margin: 0.5em 20px 0 20px;
+  border-top: 3px double #ccc;
+  padding: 1em 0 1em 0;
+  font-size: 80%;
+  color: #888;
+}
+footer .author {
+  color: #000;
+}
+
+</style>
+</head>
+
+  <body>
+    <div class="container">
+      <header class="header">
+  <div class="blog-title">
+    <a href="/" class="logo">Amorphous</a>
+    <div class="subtitle"></div>
+  </div>
+  <nav class="navbar">
+    <ul class="menu">
+
+        <li class="menu-item">
+          <a href="/" class="menu-item-link">Home</a>
+        </li>
+
+        <li class="menu-item">
+          <a href="/about" class="menu-item-link">About</a>
+        </li>
+
+    </ul>
+  </nav>
+</header>
+
+<article class="post">
+  <div class="post-title">
+    <h1 class="article-title">Stanford CS 229, 231A, 231N and Berkeley CS 280 Notes</h1>
+  </div>
+
+
+  <div class="post-content">
+    <!-- <h3></h3> -->
+    <p>Note: in progress</p>
+
+    <h3>Stanford 231A: Computer Vision</h3>
+    <h4><i>Camera Models</i></h4>
+    <p>Pinhole camera model: An aperature limits the light from a 3D scene hitting the film, creating a 1-to-1 correspondence between the 3d object and a point on the film which forms a 2d image. As the aperture size increases, each point on the film can be affected by multiple points in 3D space, causing a blur. Conversely, a smaller aperture causes a darker but sharper image.</p>
+    <p>To capture sharp and bright photos, lenses refract light to converge at a single point on the image plane (holds for a single point, not all 3d points in a scene). Lenses focus a specific distance and blur other distances.</p>
+    <p>Depth of field: effective range at which cameras can take clear photos</p>
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+      <img src="images/camera_projection.png" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+      <figcaption style="text-align: center;">Pinhole Camera Model</figcaption>
+    </div>
+    <p>When the pinhole/center of camera (O) is placed behind the image/retinal plane, it is termed the virtual plane. The focal distance (f) represents the distance between the image plane and the pinhole O. The projection of the 3d image onto the image
+       plane and the image plane onto the virtual plane are similar. </p>
+    <p>Define the camera coordinate system centered at O and let the z axis be perpendicular to the image plane, called the optical axis. </p>
+    <p>Given corresponding points (x', y') in 2d-space and (x, y, z) in 3d-space, [x', y'] = [\(fk \frac{x}{z}\), \(fl \frac{y}{z}\)] = [\(\alpha \frac{x}{z}+c_x\), \(\beta \frac{y}{z}+c_y\)], where f is the focal length and k and l are parameters for change of units to pixels and \([c_x, c_y]\) are a translation vector since the image plane origin is at the center and images typically have their origin at the lower left corner of the image.</p>
+    <p>Radial distortion: portions of the lens have differing focal lengths which causes image magification to decrease (barrel distortion) or increase (pincushion distortion).</p>
+    <p>Homogenous coordinates: Introduce a new coordinate, so (x, y) becomes (x, y, 1). Similarly, the relationship between a point in 3d-space and 2d-space is \(P' = \begin{bmatrix} x' \\ y' \\ z \end{bmatrix} = \begin{bmatrix} \alpha & 0 & c_x & 0 \\ 0 & \beta & c_y & 0 \\ 0 & 0 & 1 & 0 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \\ 1\end{bmatrix} = \begin{bmatrix} \alpha & 0 & c_x & 0 \\ 0 & \beta & c_y & 0 \\ 0 & 0 & 1 & 0 \end{bmatrix}P = \begin{bmatrix} \alpha & 0 & c_x \\ 0 & \beta & c_y \\ 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} I & 0 \end{bmatrix} P = K \begin{bmatrix} I & 0 \end{bmatrix} P\)
+    </p>
+    <p>Skewness: the angle between the two axes is slightly larger or smaller than 90 degrees</p>
+    <p>To account for skew, the camera matrix \(K  = \begin{bmatrix} x' \\ y' \\ z \end{bmatrix} = \begin{bmatrix} \alpha & -\alpha cot\theta & c_x \\ 0 & \frac{\beta}{sin\theta} & c_y \\ 0 & 0 & 1 \end{bmatrix}\). The 5 degrees of freedom of K (2 for focal length, 2 for offset, and 1 for skew) are the intrinsic parameters which are specific to a camera.</p>
+    <p>Extrinsic parameters are the rotation matrix R and translation vector T which convert any world reference system to camera coordinates as follows and do not depend on the camera: \(P = \begin{bmatrix} x \\ y \\ z \\ 1 \end{bmatrix} = \begin{bmatrix} R & T \\ 0 & 1 \end{bmatrix}P_w\)</p>
+    <h4><i>Single View Metrology</i></h4>    
+    <p>Isometric transformation: transformations that preserve distances (translation/reflection/rotation), mathematically \(\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = \begin{bmatrix} R & t \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\), where \(\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix}\) is the point after the transformation</p>
+    <p>Similarity transformation: preserve shape plus scaling. Mathematically, \(\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = \begin{bmatrix} SR & t \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\), where \(S = \begin{bmatrix} s & 0 \\0 & s \end{bmatrix}\)</p>
+   <p>Affine transformation: preserve parallelism, defined \(T(v) = Av + t\), where \(A\) is the linear transformation and is mathematically \(\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = \begin{bmatrix} A & t \\ 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\)</p>
+   <p>Projective transformation/homography: maps lines to lines, but may not preserve parallelism. Mathematically, \(\begin{bmatrix} x' \\ y' \\ 1 \end{bmatrix} = \begin{bmatrix} A & t \\ v & b \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix}\). Further, the cross ratio of four collinear points (\(P_1, P_2, P_3, P_4\)) defined \(\frac{\lVert P_3-P_1\rVert \lVert P_4 - P_2\rVert}{\lVert P_3-P_2\rVert \lVert P_4 - P_1\rVert}\) is invariant during projective transformations. </p>
+   <p>Projective geometry: To find the angle between two vectors \(v_1, v_2\), \(cos \theta = \frac{d_1 \cdot d_2}{\lVert d_1 \rVert \lVert d_2 \rVert} = \frac{v_1^T \omega v_2}{\sqrt{v_1^T \omega v_1}\sqrt{v_2^T \omega v_2}}\) and between planes using their normal vectors \(n_1, n_2\) and vanishing lines \(l_1, l_2\) which are the projective transformation of a two parallel lines in 3d-world onto a line in 2d-world (i.e. horizon line and can be computed \(l_{horiz} = \begin{bmatrix} A & t \\ v& b\end{bmatrix}^{-T} l_{\infty}\)): \(cos \theta = \frac{n_1 \cdot n_2}{\lVert n_1 \rVert \lVert n_2 \rVert} = \frac{l_1^T \omega^{-1} l_2}{\sqrt{l_1^T \omega^{-1} l_1} \sqrt{l_2^T \omega^{-1} l_2}}\), where \(\omega = (KK^T)^{-1}\) </p>
+   <h4><i>Epipolar Geometry</i></h4>
+   <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+    <img src="images/epipolar.png" height="50%" width="50%" style="display: block; margin: 0 auto;" />
+    <figcaption style="text-align: center;">Epipolar Geometry Setup</figcaption>
+  </div>
+   <p>THe projection of the point P in 3d-space onto the image plane is denoted \(p_l\) and \(p_r\). The camera centers are at \(O_l\) and \(O_r\). The line connecting them is called the baseline baseline. Where the baseline intersects the two image planes are called epipoles, denoted \(e_l\) and \(e_r\). The epipolar plane is defined by the two camera centers and the 3D point P. The intersection of the epipolar plane and the image planes form epipolar lines.</p>
+   <p>An essential matrix relates corresponding points between two calibrated cameras and is defined as the product of the transpose of the calibration matrix of the specific camera (T) and the relative pose matrix between the two cameras (R). Solving for \(y_l = E^Tp_l\) and \(y_r = E^Tp_r\) gives the epipolar lines on the image planes. Also, \(E^T \cdot e_l = E^T \cdot e_r=0\) since \(e_l\) and \(e_r\) are on the same epipolar line for corresponding projections</p>
+   <p>Now, lets go into the mathematical definitions. Given a series of correspondences \({x_1, y_1, x_2, y_2}\), camera intrinsic matrix \(K_1, K_2\), the aim is to solve R and T for a specific camera and the depth \(\alpha\) for the first camera and \(\beta\) for the second camera. The projections on the image plane are defined \(p_l = K_1^{-1}[x_1, y_1, 1]^{T}\) and \(p_r = K_2^{-1}[x_2, y_2, 1]^{T}\), then \(\beta p_r = \alpha R p_l + T\). The epipolar constraint states \(p_r^{T}(T \times Rp_l) = 0\) due to their coplanarity. </p>
+   <p>Image Rectification: compute homographies to apply to the slanted image planes to make them parallel to one another. Using the fundamental matrix from the 8-point algorithm, we can find the epipolar lines and correspondences. To find the homographies, we solve a least squares problem \(Wa = b\) for a where \(W = \begin{bmatrix}
+    \hat{x}_1 & \hat{y}_1 & 1 \\
+    \vdots & \vdots & \vdots \\
+    \hat{x}_n & \hat{y}_n & 1 \\
+    \end{bmatrix}\) and \(b = \begin{bmatrix}
+    \hat{x'}_1 \\
+    \vdots\\
+    \hat{x'}_n\\
+    \end{bmatrix} \) then use a to solve \(H_a = \begin{bmatrix}
+    \ a_1 & a_2 & a_3 \\
+    \ 0 & 1 & 0 \\
+    \ 0 & 0 & 1 \\
+    \end{bmatrix}\) and the the homography to rectify the second image \(H_2 = T^{−1}GRT = \begin{bmatrix}
+    \ 1 & 0 & -\frac{width}{2} \\
+    \ 0 & 1 & -\frac{height}{2} \\
+    \ 0 & 0 & 1 \\
+    \end{bmatrix}^{-1} \begin{bmatrix}
+    \ 1 & 0 & 0 \\
+    \ 0 & 1 & 0 \\
+    \ -\frac{1}{f} & 0 & 1 \\
+    \end{bmatrix} \begin{bmatrix}
+    \ \alpha \frac{e_1}{\sqrt{e_1^2+e_2^2}} &  \alpha \frac{e_2}{\sqrt{e_1^2+e_2^2}} & 0  \\
+    \ -\alpha \frac{e_2}{\sqrt{e_1^2+e_2^2}} & \alpha \frac{e_1}{\sqrt{e_1^2+e_2^2}} & 0 \\
+    \ 0 & 0 & 1 \\
+    \end{bmatrix} \begin{bmatrix}
+    \ 1 & 0 & -\frac{width}{2} \\
+    \ 0 & 1 & -\frac{height}{2} \\
+    \ 0 & 0 & 1 \\
+    \end{bmatrix}\) and the corresponding homography to rectify the first image that minimizes the squared distance summed of corresponding points between images \(H_1\) from solving \(\arg \min_{H1} \lVert H_1 p_i - H_2 p'_i \rVert^2 \) where \((e_1, e_2, 1)\) are homogenous coordinates and \(\alpha = 1\) if \(e_1 \geq 1\) else \(\alpha = -1\). After applying this transformation, we finally have an epipole at infinity, so we can translate back to the regular image space. Using \(H_1, H_2\), two images can be rectified given a set of corresponding points. </p>
+    <h4><i>Stereo Systems and Structure from Motion</i></h4> 
+    <p></p>
+   <script>
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    </script>
+
+    <figure class="highlight plain">
+      <table>
+
+
+          <td class="code">
+            <pre>
+              <span class="line"></span>
+              </pre>
+          </td>
+
+        </table>
+    </figure>
+  <div class="post-footer">
+
+
+    <a href="#top" class="top">Back to Top</a>
+  </div>
+</article>
+
+<footer>
+  <span class="author">
+  </span>
+</footer>
+
+
+    </div>
+    
+  </body>
+</html>

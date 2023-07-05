@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+
+
+
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+
+  <title>Amorphous</title>
+  <link rel="icon" href="https://img.icons8.com/ios-filled/50/000000/data-matrix-code.png" type="image/x-icon">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
+  <meta name="keywords" content=>
+
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 5.4.0">
+<style>
+  body {
+  margin: 0;
+}
+html,
+body,
+.container {
+  height: 101%;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  letter-spacing: 0.01rem;
+}
+.container {
+  max-width: 840px;
+  margin: 0 auto;
+}
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+.home {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+.home .info {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+.home .info .logo {
+  font-size: 2.5em;
+  font-weight: bold;
+}
+.home .info .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.home .info .sns {
+  margin: 1em auto;
+}
+.home .info .sns a {
+  width: 55px;
+  color: #999;
+  display: inline-block;
+}
+.home .info .sns a:hover {
+  color: #000;
+}
+.home .info footer {
+  border: 0;
+  color: #000;
+  padding: 0;
+}
+.page {
+  margin: 0 20px;
+  margin-bottom: 2em;
+}
+.page p {
+  line-height: 1.5em;
+}
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Tomorrow Comment */
+.highlight .comment,
+.highlight .quote {
+  color: #408090;
+}
+/* Tomorrow Red */
+.highlight .variable,
+.highlight .template-variable,
+.highlight .tag,
+.highlight .name,
+.highlight .selector-id,
+.highlight .selector-class,
+.highlight .regexp,
+.highlight .deletion {
+  color: #c82829;
+}
+/* Tomorrow Orange */
+.highlight .number,
+.highlight .built_in,
+.highlight .builtin-name,
+.highlight .literal,
+.highlight .type,
+.highlight .params,
+.highlight .meta,
+.highlight .link {
+  color: #f5871f;
+}
+/* Tomorrow Yellow */
+.highlight .attribute {
+  color: #eab700;
+}
+/* Tomorrow Green */
+.highlight .string,
+.highlight .symbol,
+.highlight .bullet,
+.highlight .addition {
+  color: #718c00;
+}
+/* Tomorrow Blue */
+.highlight .title,
+.highlight .section {
+  color: #4271ae;
+}
+/* Tomorrow Purple */
+.highlight .keyword,
+.highlight .selector-tag {
+  color: #8959a8;
+}
+.highlight {
+  display: block;
+  overflow-x: auto;
+  background: #fff;
+  color: #000;
+  padding: 0.5em;
+}
+.highlight .emphasis {
+  font-style: italic;
+}
+.highlight .strong {
+  font-weight: bold;
+}
+.header {
+  margin-bottom: -0.6em;
+  padding: 0 20px;
+}
+.header .blog-title {
+  font-size: 2.5em;
+  text-align: center;
+  padding-top: 0.5em;
+}
+.header .subtitle {
+  font-size: 14px;
+  color: #808080;
+}
+.header .menu {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid #ccc;
+  margin-top: 20px;
+}
+.header .menu .menu-item {
+  margin: 0 15px 0 0;
+  padding: 3px 0 3px 0;
+  float: inherit;
+  display: inline-block;
+}
+.header .menu .menu-item-link {
+  color: #999;
+}
+.header .menu .menu-item-link:hover {
+  color: #000;
+}
+.post {
+  padding: 0 20px;
+  margin-bottom: 1.5em;
+}
+.post img {
+  max-width: 100%;
+}
+.post table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.post table td,
+.post table th {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+.post hr {
+  margin: 1.5em 0;
+}
+.post .post-content {
+  text-align: justify;
+}
+.post .post-content a {
+  border-bottom: 1px solid;
+}
+.post .post-content a:hover {
+  border-bottom: 1px solid;
+}
+.post .post-content ul,
+.post .post-content ol {
+  text-align: left;
+}
+.post .post-content ul li,
+.post .post-content ol li {
+  padding: 0px;
+  line-height: 1.5em;
+}
+.post figure {
+  margin: 0;
+}
+.post figure table {
+  width: 100%;
+}
+.post figure table .code {
+  border: 0;
+  padding: 0;
+}
+.post figure .gutter {
+  display: none;
+}
+.post blockquote {
+  margin: 0;
+  padding: 0 15px;
+  color: #777;
+  border-left: 4px solid #ddd;
+}
+.post pre {
+  margin: 0;
+  padding: 0.5em 1.5em;
+  overflow: auto;
+  font-size: 110%;
+  line-height: 1.5;
+  background-color: #f7f7f7;
+}
+.post code {
+  font-family: Monaco, source code pro, Inconsolata, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+  font-size: 1.02em;
+  background: #eee;
+  margin: 5px;
+  padding: 0 5px;
+}
+.post p {
+  line-height: 1.5em;
+}
+.post .toc {
+  padding: 1em;
+  list-style-type: square;
+}
+.post .toc-child {
+  list-style: square;
+}
+.post .post-footer {
+  line-height: 1;
+  min-height: 1em;
+}
+.post .post-footer .top {
+  float: right;
+  color: #666;
+}
+.post .post-footer .top:hover {
+  color: #000;
+}
+.post .post-footer .post-tag-list {
+  display: inline-block;
+  padding: 0;
+  margin: 0 0 0.5em 0;
+  color: #999;
+}
+.post .post-footer .post-tag-list .post-tag-list-item {
+  display: inline-block;
+  margin: 0 1em 0 0;
+}
+.post .post-footer .post-tag-list .post-tag-list-item a {
+  font-size: 85%;
+}
+.post .post-footer .post-tag-list .post-tag-list-item:before {
+  content: '#';
+}
+.archive {
+  padding: 0 20px;
+  margin-bottom: 1em;
+}
+.archive .post-archive {
+  list-style: none;
+  padding: 0;
+}
+.archive .post-archive .post-item {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.archive .post-archive .post-item .post-date {
+  font-size: 80%;
+  color: #aaa;
+  font-family: Monaco, monospace, Hiragino Sans GB, Microsoft YaHei, WenQuanYi, Airal, sans-serif;
+}
+@media screen and (max-width: 425px) {
+  .archive .post-archive .post-item .post-date {
+    float: none;
+    margin-left: 0.5em;
+    font-size: 90%;
+    color: #999;
+  }
+}
+.archive .post-archive .post-item .post-title {
+/* border-bottom: 1px dotted; */
+  text-decoration: none;
+}
+.archive .post-archive .post-item .post-title:hover {
+  border-bottom: 1px solid;
+}
+.page-nav {
+  padding: 0 20px;
+}
+.page-nav .prev,
+.page-nav .page-number {
+  padding: 10px 20px 10px 0;
+}
+.page-nav .next {
+  float: right;
+}
+.page-nav a {
+  color: #777;
+}
+.page-nav a:hover {
+  color: #000;
+}
+.code-toggle {
+    margin-bottom: 10px;
+}
+
+.code-toggle button {
+    background-color: #f5f5f5;
+    border: none;
+    color: #333;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.code-toggle button:hover {
+    background-color: #e0e0e0;
+}
+footer {
+  margin: 0.5em 20px 0 20px;
+  border-top: 3px double #ccc;
+  padding: 1em 0 1em 0;
+  font-size: 80%;
+  color: #888;
+}
+footer .author {
+  color: #000;
+}
+
+
+</style>
+</head>
+
+  <body>
+    <div class="container">
+      <header class="header">
+  <div class="blog-title">
+    <a href="/" class="logo">Amorphous</a>
+    <div class="subtitle"></div>
+  </div>
+  <nav class="navbar">
+    <ul class="menu">
+
+        <li class="menu-item">
+          <a href="/" class="menu-item-link">Home</a>
+        </li>
+
+        <li class="menu-item">
+          <a href="/about" class="menu-item-link">About</a>
+        </li>
+
+    </ul>
+  </nav>
+</header>
+
+<article class="post">
+  <div class="post-title">
+    <h1 class="article-title">Common Algorithm Implementations</h1>
+  </div>
+  <div class="post-content">
+    <h3>Binary Search Tree</h3>
+    <p>Note: in progress</p>
+    <p>Problem: Maintain an ordered set of elements, supporting quick insertion and search.</p>
+    <p>Theory: Maintain a binary tree such that all nodes in the left subtree are smaller and all nodes in the right subtree are bigger than the current node. This allows for quick inserts and deletes, given that the tree is balanced.</p>
+    <div class="code-toggle">
+      <button onclick="toggleCode('python')">Python</button>
+      <button onclick="toggleCode('cpp')">C++</button>
+    </div>
+    <pre id="python-code" class="language-python">
+  class Node:
+    def __init__(self, v):
+      self.v = v
+      self.left, self.right = None, None
+      
+    def insert(self, x):
+      if x < self.v:
+        if self.left is not None:
+          self.left.insert(x)
+        else:
+          self.left = Node(x)
+      elif x > self.v:
+        if self.right is not None:
+          self.right.insert(x)
+        else:
+          self.right = Node(x)
+        
+    def search(self, x):
+      if self.v == x:
+        return True
+      elif x < self.v:
+        return self.left.search(x) if self.left is not None else False
+      else:
+        return self.right.search(x) if self.right is not None else True
+  </pre>
+  <pre id="cpp-code" class="language-cpp" style="display: none;">
+  int binarySearch() {
+    int p = 0;
+    for (int i = N; i >= 1; i /= 2) {
+        while (p + i < N && func(p + i)) p += i;
+    }
+    return p;
+  }
+  </pre>
+      <p>Runtime: 
+      <p><code>insert</code>: \(O(\lg n)\) since the height of the balanced Tree is \(O(\lg n)\)</p>
+      <p><code>search</code>: \(O(\lg n)\) since the height of the balanced tree is \(O(\lg n)\)</p>
+
+   <script>
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    </script>
+
+    <script>
+      // For Prism.js
+      Prism.highlightAll();
+    
+      function toggleCode(language) {
+        const pythonCode = document.getElementById('python-code');
+        const cppCode = document.getElementById('cpp-code');
+      
+        if (language === 'python') {
+          pythonCode.style.display = 'block';
+          cppCode.style.display = 'none';
+        } else if (language === 'cpp') {
+          pythonCode.style.display = 'none';
+          cppCode.style.display = 'block';
+        }
+      
+        Prism.highlightAll();
+      }
+    </script>
+
+    <figure class="highlight plain">
+      <table>
+
+
+          <td class="code">
+            <pre>
+              <span class="line"></span>
+              </pre>
+          </td>
+
+        </table>
+    </figure>
+  <div class="post-footer">
+
+
+    <a href="#top" class="top">Back to Top</a>
+  </div>
+</article>
+
+<footer>
+  <span class="author">
+  </span>
+</footer>
+
+
+    </div>
+    
+  </body>
+</html>
