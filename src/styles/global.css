@@ -1,0 +1,82 @@
+html,
+body {
+    @apply w-full h-full m-0 p-0;
+}
+
+* {
+    @apply text-pixel-primary dark:text-pixel-dark-primary text-base;
+}
+
+h1 {
+    @apply text-4xl;
+}
+
+h2 {
+    @apply text-3xl;
+}
+
+h3 {
+    @apply text-2xl;
+}
+
+h4 {
+    @apply text-xl;
+}
+
+h5 {
+    @apply text-lg;
+}
+
+h6 {
+    @apply text-base;
+}
+
+a {
+    @apply border-b-2 border-pixel-light dark:border-pixel-dark-light hover:bg-pixel-light;
+}
+
+p {
+    @apply break-words;
+}
+
+.shadow-pixel {
+    @apply border-pixel-primary dark:border-pixel-dark-primary border-2 border-solid;
+}
+
+pre {
+    @apply px-4 !bg-pixel-code-bg rounded dark:!bg-pixel-dark-code-bg;
+}
+
+ol {
+    @apply pl-6 my-4;
+    list-style: none;
+    counter-reset: custom-counter;
+}
+
+ol li {
+    counter-increment: custom-counter;
+    position: relative;
+}
+
+ol li::before {
+    @apply text-pixel-light dark:text-pixel-dark-light;
+    content: counter(custom-counter) ".";
+    position: absolute;
+    left: -1.5rem;
+}
+
+ul {
+    @apply list-disc pl-6 my-4;
+}
+
+ul ul {
+    @apply list-circle;
+}
+
+ul ul ul {
+    @apply list-square;
+}
+
+li {
+    @apply my-2;
+}

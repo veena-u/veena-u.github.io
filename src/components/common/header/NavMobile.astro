@@ -1,0 +1,56 @@
+---
+import HeaderLink from "./HeaderLink.astro";
+import { NAVIGATION } from "@/config";
+import MenuIcon from "@/components/icons/nav-mobile/index.astro";
+
+const links = NAVIGATION.left;
+---
+
+<button class="sm:hidden mobile-menu">
+    <MenuIcon icon="menu" />
+</button>
+<div
+    id="mobile-menu-container"
+    class="-translate-x-full transform duration-300 fixed left-0 top-0 h-full w-full z-10 bg-pixel-menu-bg dark:bg-pixel-dark-menu-bg px-4 py-2"
+>
+    <div class="flex px-2.5 py-3">
+        <button class="sm:hidden mobile-menu">
+            <MenuIcon icon="closeMenu" />
+        </button>
+    </div>
+    <nav class="fixed mt-8">
+        {
+            links.map((link) => (
+                <div class="flex justify-center px-12 py-4">
+                    <HeaderLink class="block sm:hidden" href={`/${link.href}`}>
+                        {link.title}
+                    </HeaderLink>
+                </div>
+            ))
+        }
+    </nav>
+</div>
+
+<script>
+    function toggleMenu() {
+        const isNavHidden = document.body.style.overflow === "";
+        document
+            .getElementById("mobile-menu-container")
+            ?.classList.toggle("-translate-x-full", !isNavHidden);
+        document
+            .getElementById("mobile-menu-container")
+            ?.classList.toggle("translate-x-0", isNavHidden);
+        document.body.style.overflow = isNavHidden ? "hidden" : "";
+    }
+
+    function addEventListener() {
+        document.querySelectorAll(".mobile-menu")?.forEach((button) => {
+            button.addEventListener("click", () => toggleMenu());
+        });
+    }
+
+    addEventListener();
+    document.addEventListener("astro:after-swap", () => {
+        addEventListener();
+    });
+</script>

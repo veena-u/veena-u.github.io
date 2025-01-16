@@ -1,0 +1,24 @@
+---
+import BaseBody from "@/components/html/BaseBody.astro";
+import BaseHead from "@/components/html/BaseHead.astro";
+import Header from "@/components/common/Header.astro";
+import Neko from '@/components/Neko';
+import { DESCRIPTION } from "@/config";
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+    <BaseHead title={title} description={DESCRIPTION} />
+    <BaseBody>
+        <Header />
+        <div class="grid my-10">
+            <Neko client:load />
+            <slot />
+        </div>
+    </BaseBody>
+</html>

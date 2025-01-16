@@ -1,0 +1,18 @@
+---
+import CloseMenu from "./icons/CloseMent.astro";
+import Menu from "./icons/Menu.astro";
+
+const components = {
+    closeMenu: CloseMenu,
+    menu: Menu,
+};
+
+interface Props {
+    icon: keyof typeof components;
+}
+
+const { icon } = Astro.props;
+const Icon = components[icon];
+---
+
+<Icon class="fill-current w-4 h-4" />

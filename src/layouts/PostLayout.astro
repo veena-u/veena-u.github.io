@@ -1,0 +1,17 @@
+---
+import type { CollectionEntry } from "astro:content";
+import RootLayout from "./RootLayout.astro";
+import Post from "@/components/post/Post.astro";
+
+interface Props {
+    post: CollectionEntry<"post">;
+}
+
+const { post } = Astro.props;
+---
+
+<RootLayout title={post.data.title}>
+    <div class="grid justify-center">
+        <Post post={post} />
+    </div>
+</RootLayout>

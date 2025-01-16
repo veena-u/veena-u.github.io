@@ -1,0 +1,27 @@
+---
+import { type Page } from "astro";
+import { getCollection } from "astro:content";
+import { ITEMS_PER_PAGE } from "@/config";
+import PostPaginationLayout from "@/layouts/PostPaginationLayout.astro";
+import { postDateCompareReverse } from "@/utils";
+
+interface Props {
+    page: Page;
+}
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+    const posts = (await getCollection("post")).sort(postDateCompareReverse);
+    
+    return paginate(posts, {
+        pageSize: ITEMS_PER_PAGE,
+    });
+}
+
+const { page } = Astro.props;
+---
+
+<PostPaginationLayout
+    metaTitle={`Post Page ${page.currentPage.toString()}`}
+    title="Posts"
+    page={page}
+/>

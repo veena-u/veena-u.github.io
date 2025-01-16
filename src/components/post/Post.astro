@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+    post: CollectionEntry<"post">;
+}
+
+const { post } = Astro.props;
+const { category, tags, created_at } = post.data;
+const { Content } = await post.render();
+---
+
+<div class="w-[85vw] max-w-4xl p-2 grid grid-cols-1 gap-y-4">
+    <p class="text-pixel-light dark:text-pixel-dark-light text-sm">
+        {`Posted at ${created_at.toISOString().substring(0, 10)} about `}
+        <a href={`/category/${category}/1`} class="text-sm">{category}</a>
+    </p>
+    <Content />
+    <p class="flex space-x-3">
+        <span>Tags:</span>
+        {
+            tags.map((tag, i) => (
+                <span class="text-base">
+                    <a href={`/tag/${tag}/1`}>{`#${tag}`}</a>
+                    {i < tags.length - 1 ? <span>, </span> : null}
+                </span>
+            ))
+        }
+    </p>
+</div>

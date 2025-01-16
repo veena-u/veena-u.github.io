@@ -1,0 +1,38 @@
+---
+import { type CollectionEntry } from "astro:content";
+import { md2txt } from "@/utils";
+import { POST_PREVIEW_LENGTH } from "@/config";
+
+type Props = CollectionEntry<"post">;
+
+const post = Astro.props;
+const { title, category, tags, created_at } = post.data;
+const content = md2txt(post.body);
+const previewContent = content.substring(0, POST_PREVIEW_LENGTH);
+---
+
+<div class="shadow-pixel dark:shadow-pixel-dark p-6 grid grid-cols-1 w-[85vw] max-w-2xl">
+    <h3>{title}</h3>
+    <p class="text-pixel-light dark:text-pixel-dark-light text-sm">
+        {`Posted at ${created_at.toISOString().substring(0, 10)} about `}
+        <a href={`/category/${category}/1`} class="text-sm">{category}</a>
+    </p>
+    <p class="text-base">
+        {
+            `${previewContent}${
+                content.length > POST_PREVIEW_LENGTH ? "..." : ""
+            }`
+        }
+    </p>
+    <p><a href={`/post/${post.slug}`} class="text-base">Read more</a></p>
+    <p class="flex space-x-3">
+        {
+            tags.map((tag, i) => (
+                <span class="text-base">
+                    <a href={`/tag/${tag}/1`}>{`#${tag}`}</a>
+                    {i < tags.length - 1 ? <span>, </span> : null}
+                </span>
+            ))
+        }
+    </p>
+</div>
