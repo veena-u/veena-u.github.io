@@ -1,0 +1,13 @@
+---
+import MobileNav from "./NavMobile.astro";
+import NavLeft from "./NavLeft.astro";
+import { NAVIGATION } from "@/config";
+---
+
+<div class="left flex">
+    <span class="flex space-x-2">
+        <NavLeft links={NAVIGATION.left} />
+    </span>
+    <MobileNav />
+</div>
+

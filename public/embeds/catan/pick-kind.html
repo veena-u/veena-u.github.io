@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catan move kind</title>
+<style>
+* { box-sizing: border-box; }
+html, body { overflow: hidden; }
+body { margin: 0; padding: 8px; background: transparent; color: #1f2937; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
+.left { flex: 0 1 300px; }
+.right { flex: 1 1 520px; }
+.head { font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: baseline; }
+.toggle { font-weight: 400; font-size: 12px; color: #374151; cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 6px; }
+.toggle i { width: 26px; height: 14px; border-radius: 7px; background: #d1d5db; position: relative; transition: background .2s; }
+.toggle i::after { content: ""; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: #fff; transition: left .2s; }
+.toggle.on i { background: #111; }
+.toggle.on i::after { left: 14px; }
+.row0 { display: flex; height: 18px; border-radius: 3px; overflow: hidden; }
+.row0 i { flex: 1; }
+.lab { font-size: 12px; color: #4b5563; margin-top: 4px; }
+.lab b { font: 10.5px ui-monospace, Menlo, monospace; color: #9ca3af; font-weight: 400; margin-left: 4px; }
+.flow { display: flex; align-items: center; gap: 8px; margin-top: 14px; font: 10.5px ui-monospace, Menlo, monospace; color: #9ca3af; }
+.flow span { padding: 1px 8px; border: 1.2px solid #9ca3af; border-radius: 4px; background: #fff; }
+.kinds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+.k { border-radius: 4px; padding: 5px 7px; background: color-mix(in srgb, var(--c) 16%, transparent); cursor: default; transition: background .25s, color .25s; }
+.k .nm { font-size: 11.5px; color: #374151; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.k .v { font: 600 11px ui-monospace, Menlo, monospace; color: #6b7280; height: 15px; }
+.k.hl { outline: 2px solid #111; }
+.kinds.masked .k { background: #f3f4f6; }
+.kinds.masked .k .nm, .kinds.masked .k .v { color: #c4c8cf; }
+.kinds.masked .k.n { background: var(--c); }
+.kinds.masked .k.n .nm, .kinds.masked .k.n .v { color: #fff; }
+.tip { position: fixed; z-index: 10; transform: translate(-50%, -100%); margin-top: -12px; padding: 3px 8px; border-radius: 5px; background: #fff; box-shadow: 0 1px 6px rgba(0, 0, 0, .18); font-size: 12px; white-space: nowrap; pointer-events: none; display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <div class="row0" id="row0"></div>
+    <div class="lab">Row 0 after the last block<b>1 × 128</b></div>
+    <div class="flow">× <span>128 × 25</span> = one score per kind →</div>
+  </div>
+  <div class="right">
+    <div class="head">Kind of move<span class="toggle" id="mask"><i></i>legal moves only</span></div>
+    <div class="kinds" id="kinds"></div>
+  </div>
+</div>
+<div class="tip" id="tip"></div>
+<script>
+// One real decision (the same turn as the moves figure): row 0's 128 numbers times a learned 128 × 25 matrix
+// give one score per kind of move. With the mask on, kinds with no legal move drop out and a softmax turns the rest into chances.
+const D = {"summary": [-0.25, 1.027, 2.077, 0.54, -0.374, -1.37, -2.494, -0.814, 0.581, -0.908, -0.776, -0.723, 0.077, -2.229, 0.529, 0.395, 1.565, -0.627, 0.107, 0.23, 0.342, 0.233, -0.889, 0.28, 0.442, 1.708, -0.341, 0.827, -0.331, 0.025, 1.537, 0.021, 1.011, 2.761, -0.32, 1.147, 1.402, -0.302, -0.13, -0.311, 0.398, -0.878, -1.08, 0.034, -0.166, -1.248, -0.276, 0.588, 0.18, 0.699, -0.534, -1.188, -0.162, -0.468, -1.446, -0.24, 1.67, -0.279, -0.732, -1.533, 0.624, 0.87, 1.362, -1.541, -0.578, -0.84, 0.491, -1.692, 0.727, -0.105, -0.675, -0.85, 0.197, 0.679, 1.51, -0.221, 0.439, 1.551, -1.793, 0.755, 0.629, 2.227, 1.092, -0.721, -0.565, 1.056, -0.335, 1.412, 0.414, -1.353, 0.398, -0.438, 0.419, 0.727, -0.229, 0.531, -0.916, -0.688, 1.072, 0.37, -0.566, 0.276, 0.351, -0.653, -0.535, -1.387, 0.633, 0.457, 1.254, -0.16, 0.905, -0.667, 1.455, -0.889, -0.718, -2.201, 0.31, 0.093, -2.034, -0.165, -1.279, 0.884, 2.574, 0.211, -1.122, -0.693, 0.075, -1.466], "scores": [10.368, 7.658, 8.029, 0.057, 0.672, -7.599, 0.417, 3.275, 7.258, 1.542, 3.223, -4.775, 3.921, -0.215, -6.324, 0.521, 0.712, -0.441, -0.545, -1.7, -0.429, 0.882, -0.188, 1.159, -0.81], "legal": [false, false, true, false, false, false, false, true, false, false, false, true, false, false, true, false, false, false, false, false, false, false, false, false, false]};
+const $ = id => document.getElementById(id);
+const NAMES = ["settlement", "city", "road", "robber", "pick resource", "bank trade", "roll", "end turn", "buy card", "knight",
+  "road building", "year of plenty", "monopoly", "rob", "offer", "give", "ask", "send", "abandon", "accept", "decline", "counter",
+  "trade with", "take counter", "cancel"];
+// Coloured by the rows a kind's target is read from, as in the move grid; kinds without a target are grey like the summary row.
+const CORNER = "#059669", EDGE = "#7c3aed", HEX = "#d97706", RESOURCE = "#0891b2", PLAYER = "#2563eb", NONE = "#78716c";
+const COLOR = [CORNER, CORNER, EDGE, HEX, RESOURCE, RESOURCE, NONE, NONE, NONE, NONE, NONE, NONE, NONE, PLAYER, NONE, RESOURCE, RESOURCE,
+  NONE, NONE, NONE, NONE, NONE, PLAYER, PLAYER, NONE];
+const MOVES = [[0, 54], [54, 54], [108, 72], [180, 19], [199, 5], [204, 20], [224, 1], [225, 1], [226, 1], [227, 1], [228, 1], [229, 1], [230, 1],
+  [231, 3], [234, 1], [235, 5], [240, 5], [245, 1], [246, 1], [247, 1], [248, 1], [249, 1], [250, 3], [253, 3], [256, 1]];
+// Row 0 in the orange/slate of the other figures.
+const lim = [...D.summary].map(Math.abs).sort((a, b) => a - b)[Math.floor(0.98 * 127)];
+const div = v => { const t = Math.max(-1, Math.min(1, v / lim)), [r, g, b] = t >= 0 ? [180, 83, 9] : [71, 85, 105], a = Math.abs(t);
+  return `rgb(${Math.round(255 + (r - 255) * a)},${Math.round(255 + (g - 255) * a)},${Math.round(255 + (b - 255) * a)})`; };
+$("row0").innerHTML = D.summary.map(v => `<i style="background:${div(v)}"></i>`).join("");
+// Chances over the legal kinds.
+const legal = D.scores.map((_, k) => k).filter(k => D.legal[k]), best = Math.max(...legal.map(k => D.scores[k]));
+const z = legal.reduce((s, k) => s + Math.exp(D.scores[k] - best), 0), P = D.scores.map((s, k) => D.legal[k] ? Math.exp(s - best) / z : 0);
+const pct = p => p >= 0.995 ? "99%" : p < 0.01 ? "<1%" : `${Math.round(100 * p)}%`;
+$("kinds").innerHTML = NAMES.map((n, k) => `<div class="k${D.legal[k] ? " n" : ""}" data-k="${k}" style="--c:${COLOR[k]}"><div class="nm">${n}</div><div class="v"></div></div>`).join("");
+const tiles = [...document.querySelectorAll(".k")];
+function fill() {
+  const masked = $("kinds").classList.contains("masked");
+  tiles.forEach((t, k) => t.querySelector(".v").textContent = masked ? (D.legal[k] ? pct(P[k]) : "") : (D.scores[k] > 0 ? "+" : "") + D.scores[k].toFixed(1));
+}
+$("mask").addEventListener("click", () => { $("mask").classList.toggle("on"); $("kinds").classList.toggle("masked"); fill(); });
+fill();
+// Pointing at a kind: which of the 257 moves it covers.
+const tip = $("tip");
+$("kinds").addEventListener("mousemove", ev => {
+  const t = ev.target.closest("[data-k]"); if (!t) return;
+  const k = +t.dataset.k, [at, n] = MOVES[k];
+  tiles.forEach(x => x.classList.toggle("hl", x === t));
+  tip.textContent = n > 1 ? `moves ${at}–${at + n - 1}` : `move ${at}`;
+  tip.style.display = "block";
+  const w = tip.offsetWidth / 2 + 4;
+  tip.style.left = Math.min(Math.max(ev.clientX, w), innerWidth - w) + "px"; tip.style.top = ev.clientY + "px";
+});
+$("kinds").addEventListener("mouseleave", () => { tip.style.display = "none"; tiles.forEach(x => x.classList.remove("hl")); });
+
+if (window.frameElement) {
+  new ResizeObserver(() => { window.frameElement.style.height = document.body.offsetHeight + "px"; }).observe(document.body);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+---
+import RootLayout from "./RootLayout.astro";
+
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<RootLayout title={title}>
+    <div class="grid justify-center">
+        <div class="w-[85vw] max-w-2xl">
+            <slot />
+        </div>
+    </div>
+</RootLayout>

@@ -1,0 +1,44 @@
+---
+import { getCollection } from "astro:content";
+import ConstrainedWidthLayout from "@/layouts/ConstrainedWidthLayout.astro";
+import { postDateCompareReverse } from "@/utils";
+
+const allPosts = await getCollection("post");
+const categories = [...new Set(allPosts.map((post) => post.data.category))];
+
+const postsByCategory = categories.map((category) => {
+    return {
+        category,
+        posts: allPosts
+            .filter((post) => post.data.category === category)
+            .sort(postDateCompareReverse),
+    };
+});
+---
+
+<ConstrainedWidthLayout title="Categories">
+    <h1 class="text-4xl my-4">Categories:</h1>
+    <div class="flex flex-wrap space-x-2">
+        {
+            postsByCategory.map(({ category, posts }) => (
+                <div>
+                    <a href={`/category/${category}/1`}>{`${category}: `}</a>
+                    <ul>
+                        {posts.map((post) => (
+                            <li class="flex space-x-2">
+                                <span>
+                                    {post.data.created_at
+                                        .toISOString()
+                                        .substring(0, 10)}
+                                </span>
+                                <a href={`/post/${post.slug}`}>
+                                    {post.data.title}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))
+        }
+    </div>
+</ConstrainedWidthLayout>

@@ -1,0 +1,11 @@
+# This site is a single package.
+packages:
+  - "."
+
+# Let esbuild and sharp run their install scripts (pnpm 10 reads onlyBuiltDependencies; newer pnpm reads allowBuilds).
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
+allowBuilds:
+  esbuild: true
+  sharp: true

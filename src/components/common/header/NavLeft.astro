@@ -1,0 +1,20 @@
+---
+import HeaderLink from "./HeaderLink.astro";
+
+interface Props {
+    links: {
+        title: string;
+        href: string;
+    }[];
+}
+
+const { links } = Astro.props;
+---
+
+{
+    links.map((link) => (
+        <HeaderLink class="hidden sm:block" href={link.href}>
+            {link.title}
+        </HeaderLink>
+    ))
+}

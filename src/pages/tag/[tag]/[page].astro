@@ -1,0 +1,38 @@
+---
+import { getCollection } from "astro:content";
+import { type Page } from "astro";
+import { ITEMS_PER_PAGE } from "@/config";
+import PostPaginationLayout from "@/layouts/PostPaginationLayout.astro";
+import { postDateCompareReverse } from "@/utils";
+
+interface Props {
+    page: Page;
+}
+
+export async function getStaticPaths({ paginate }: { paginate: any }) {
+    const allPosts = await getCollection("post");
+
+    const uniqueTags = [
+        ...new Set(allPosts.map((post) => post.data.tags).flat()),
+    ];
+    return uniqueTags.flatMap((tag) => {
+        const filteredPosts = allPosts
+            .filter((post) => post.data.tags.includes(tag))
+            .sort(postDateCompareReverse);
+
+        return paginate(filteredPosts, {
+            pageSize: ITEMS_PER_PAGE,
+            params: { tag },
+        });
+    });
+}
+
+const { tag } = Astro.params;
+const { page } = Astro.props;
+---
+
+<PostPaginationLayout
+    metaTitle={`Tag`}
+    title={`Tag: ${tag}`}
+    page={page}
+/>

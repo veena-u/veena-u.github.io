@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Play the network</title>
+<style>
+:root { --ink: #1f2937; --muted: #6b7280; --line: #e5e7eb; --soft: #f9fafb; --orange: #b45309; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; }
+body { color: var(--ink); background: #fff; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button { font: inherit; border: 1px solid var(--line); background: #fff; color: #374151; border-radius: 5px; padding: 4px 10px; cursor: pointer; }
+button:hover:not(:disabled) { border-color: #9ca3af; }
+button:disabled { opacity: .35; cursor: default; }
+button.primary { background: #111; border-color: #111; color: #fff; }
+button.active { border-color: #111; box-shadow: 0 0 0 1px #111; color: #111; }
+#app { display: grid; grid-template-columns: 1fr 250px; grid-template-rows: 34px 1fr auto; height: 100vh; gap: 0 12px; padding: 6px 8px 8px; }
+#top { grid-column: 1 / 3; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
+#top b { color: var(--ink); font-size: 13px; }
+#top .grow { flex: 1; }
+#board-wrap { position: relative; min-height: 0; background: #6fa8d6; border-radius: 8px; }
+#board { width: 100%; height: 100%; display: block; }
+#side { grid-row: 2 / 4; grid-column: 2; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.panel { background: #fff; border: 1px solid var(--line); border-radius: 8px; }
+#players { padding: 4px; display: flex; flex-direction: column; gap: 2px; }
+.player { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 6px; }
+.player.current { background: var(--soft); box-shadow: inset 0 0 0 1px var(--line); }
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+.pname { font-weight: 600; font-size: 12.5px; }
+.pstats { color: var(--muted); font: 10.5px ui-monospace, Menlo, monospace; display: flex; gap: 8px; flex-wrap: wrap; }
+.vp { font: 600 16px ui-monospace, Menlo, monospace; }
+.badge { font: 10px system-ui, sans-serif; padding: 0 5px; border-radius: 4px; background: #f3f4f6; color: var(--ink); }
+#log { flex: 1; overflow-y: auto; padding: 6px 9px; font-size: 12px; min-height: 0; }
+#log .event { padding: 2px 0; border-bottom: 1px solid #f3f4f6; }
+#log .who { font-weight: 600; }
+#bottom { grid-column: 1; display: flex; align-items: flex-end; gap: 10px; padding-top: 6px; }
+#hand { padding: 6px 8px; display: flex; gap: 4px; align-items: flex-end; min-height: 66px; flex: none; }
+.card { width: 36px; height: 52px; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 4px 0; color: #111; position: relative; border: 1px solid rgba(0, 0, 0, .15); user-select: none; }
+.card .count { font: 600 15px ui-monospace, Menlo, monospace; }
+.card .label { font-size: 9px; text-transform: uppercase; letter-spacing: .3px; }
+.card.clickable { cursor: pointer; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #111; }
+.card.faded { opacity: .35; }
+.brick { background: #cf7b57; } .lumber { background: #6a9a6f; color: #fff; } .wool { background: #b5d99a; }
+.grain { background: #efd47a; } .ore { background: #aab0ba; } .dev { background: #7c3aed; color: #fff; }
+#actions { padding: 6px; display: flex; gap: 5px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+#roll { position: absolute; left: 6px; top: 4px; padding: 4px 10px; font: 600 18px ui-monospace, Menlo, monospace; }
+#roll small { font: 10px system-ui, sans-serif; color: var(--muted); display: block; }
+#bank { position: absolute; left: 6px; top: 56px; padding: 5px 7px; }
+#bank small { font-size: 10px; color: var(--muted); display: block; margin-bottom: 3px; }
+#bank .stock { display: grid; grid-template-columns: repeat(3, 26px); gap: 3px; }
+#bank .stock div { height: 30px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, .15); display: grid; place-items: center; font: 600 11.5px ui-monospace, Menlo, monospace; }
+#banner { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); padding: 5px 12px; font-weight: 600; display: none; align-items: center; gap: 8px; white-space: nowrap; }
+#trade, #offer { position: absolute; left: 50%; transform: translateX(-50%); padding: 10px 12px; display: none; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
+#trade { bottom: 4px; min-width: 360px; }
+#offer { top: 42px; min-width: 300px; }
+h3 { margin: 0 0 6px; font-size: 13px; }
+.row { display: flex; align-items: center; gap: 6px; margin: 5px 0; }
+.row .what { width: 56px; font-size: 12px; color: var(--muted); }
+.chip { width: 38px; height: 38px; border-radius: 5px; display: grid; place-items: center; font-size: 9px; text-transform: uppercase; position: relative;
+  cursor: pointer; border: 1px solid rgba(0, 0, 0, .15); }
+.chip .n { position: absolute; right: 3px; bottom: 1px; font: 600 12px ui-monospace, Menlo, monospace; text-transform: none; }
+.chip.off { opacity: .3; cursor: default; }
+.chip.picked { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #111; }
+.builder { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+button.minus { padding: 0 7px; font-size: 12px; line-height: 14px; }
+.minus-space { height: 16px; }
+.offer-head { display: flex; align-items: center; gap: 10px; }
+.offer-side { display: flex; flex-direction: column; gap: 2px; }
+.offer-side small, .counter-offer small { color: var(--muted); font-size: 10.5px; }
+.swap { color: var(--muted); }
+.tiles { display: flex; gap: 3px; }
+.tile { width: 22px; height: 30px; border-radius: 4px; position: relative; border: 1px solid rgba(0, 0, 0, .15); }
+.tile b { position: absolute; right: -5px; bottom: -6px; background: #111; color: #fff; border-radius: 6px; font: 9.5px ui-monospace, Menlo, monospace; padding: 0 3px; }
+.tile.any { width: auto; padding: 0 6px; background: #f3f4f6; font-size: 10.5px; display: grid; place-items: center; }
+.responses { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.response { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.mark { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; color: #fff; flex: none; padding: 0; border: 0; }
+.mark.yes { background: #16a34a; } .mark.no { background: #475569; } .mark.wait { background: #d1d5db; }
+button.mark { cursor: pointer; box-shadow: 0 0 0 3px rgba(22, 163, 74, .25); }
+.counter-offer { display: flex; align-items: center; gap: 8px; margin-left: 30px; padding: 6px 8px; border-radius: 6px; background: var(--soft); border: 1px solid var(--line); }
+.choices { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+.result { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.discarding { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; margin-left: 6px; }
+.x { border: 0; color: var(--muted); padding: 0 4px; }
+.seat-name { font-weight: 600; }
+svg .target { cursor: pointer; }
+#start, #over { position: absolute; inset: 0; display: none; place-items: center; background: rgba(255, 255, 255, .85); z-index: 5; }
+#start .panel, #over .panel { padding: 18px 22px; text-align: center; max-width: 420px; }
+#start h2, #over h2 { margin: 0 0 6px; font-size: 16px; }
+#start p { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+#start .modes { display: flex; gap: 10px; justify-content: center; }
+#start .modes button { padding: 10px 14px; text-align: left; }
+#start .modes small { display: block; color: var(--muted); font-size: 11px; }
+#start .modes button.cur { border-color: #111; box-shadow: 0 0 0 1px #111; }
+#start .modes button i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+.fly { position: fixed; z-index: 20; width: 22px; height: 30px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, .2); pointer-events: none;
+  transition: transform 1.3s cubic-bezier(.45, 0, .25, 1), opacity .25s; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); }
+.got { animation: got .45s ease-out; }
+@keyframes got { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <b>Play the network</b><span id="rules"></span><span class="grow"></span>
+    <label>bots move every <select id="pace"><option value="250">0.25 s</option><option value="600" selected>0.6 s</option><option value="1200">1.2 s</option></select></label>
+    <button id="newgame">New game</button>
+  </div>
+  <div id="board-wrap">
+    <svg id="board"></svg>
+    <div id="roll" class="panel"><small>last roll</small><span id="rollsum">–</span></div>
+    <div id="bank" class="panel"><small>bank</small><div class="stock" id="stock"></div></div>
+    <div id="banner" class="panel"></div>
+    <div id="offer" class="panel"></div>
+    <div id="trade" class="panel"></div>
+  </div>
+  <div id="side">
+    <div id="players" class="panel"></div>
+    <div id="log" class="panel"></div>
+  </div>
+  <div id="bottom">
+    <div id="hand" class="panel"></div>
+    <div id="actions" class="panel"></div>
+  </div>
+  <div id="start"><div class="panel">
+    <h2>Play against the trained network</h2>
+    <p>Colonist's rules. The network runs in your browser and only sees what you would see.</p>
+    <div class="modes">
+      <button data-mode="2p">1 v 1<small>first to 15, no player trades</small></button>
+      <button data-mode="4p">4 players<small>you and three networks, first to 10</small></button>
+    </div>
+    <div id="seatpick" style="display:none"><p style="margin:14px 0 8px">Your seat</p><div class="modes" id="seatbuttons"></div></div>
+    <p id="loading" style="margin:10px 0 0"></p>
+  </div></div>
+  <div id="over"><div class="panel"><h2 id="winner"></h2><button class="primary" id="again">Play again</button></div></div>
+</div>
+<script type="module">
+// The trained network to play against, entirely in the browser: the Rust engine compiled to WebAssembly (play/catan.wasm),
+// the network in plain JavaScript (play/net.js, checked against PyTorch) and the Python viewer's game logic (play/session.js).
+import { loadEngine } from "./play/engine.js";
+import { loadWeights } from "./play/net.js";
+import { Session, NAMES } from "./play/session.js";
+
+const RES = ["brick", "lumber", "wool", "grain", "ore"];
+const DEV = [["knight", "Knight", "play knight"], ["victory point", "VP", null], ["road building", "Roads", "play road building"],
+  ["year of plenty", "YoP", "play year of plenty"], ["monopoly", "Mono", "play monopoly"]];
+const TERRAIN = { hills: "#cf7b57", forest: "#6a9a6f", pasture: "#b5d99a", fields: "#efd47a", mountains: "#aab0ba", desert: "#ebe3cb" };
+const COLORS = ["#2563eb", "#ea580c", "#16a34a", "#db2777"];
+const R = 52, XS = R * Math.sqrt(3) / 2, YS = R / 2;
+let give = [0, 0, 0, 0, 0], get = [0, 0, 0, 0, 0];
+let session = null, view = null, mode = null, timer = null, busy = false, bankGive = null, dismissed = null, chosen = [0, 0, 0, 0, 0], current = null;
+
+const $ = id => document.getElementById(id);
+const el = (tag, attrs = {}, kids = []) => {
+  const node = tag.startsWith("svg:") ? document.createElementNS("http://www.w3.org/2000/svg", tag.slice(4)) : document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "on") for (const [e, f] of Object.entries(v)) node.addEventListener(e, f);
+    else if (k === "text") node.textContent = v;
+    else node.setAttribute(k, v);
+  }
+  for (const kid of [].concat(kids)) if (kid != null) node.append(kid);
+  return node;
+};
+const pt = ([x, y]) => [x * XS, y * YS];
+const yours = () => view && view.toAct === view.human && view.winner == null;
+const movesOf = kind => view.moves.filter(m => m.kind === kind);
+const moveOf = (kind, test = () => true) => view.moves.find(m => m.kind === kind && test(m));
+const who = seat => seat === view.human ? "You" : NAMES[seat];
+
+// ---- Loading a mode: the engine once, each checkpoint's weights when first chosen.
+const cache = {};
+let engine = null, tables = null;
+async function load(name) {
+  if (!engine) {
+    const [wasm, t] = await Promise.all([fetch("./play/catan.wasm").then(r => r.arrayBuffer()), fetch("./play/tables.json").then(r => r.json())]);
+    engine = await loadEngine(wasm); tables = t;
+  }
+  if (!cache[name]) {
+    const [manifest, raw] = await Promise.all([fetch(`./play/weights-${name}.json`).then(r => r.json()), fetch(`./play/weights-${name}.bin`).then(r => r.arrayBuffer())]);
+    cache[name] = { manifest, weights: loadWeights(manifest, raw) };
+  }
+  return cache[name];
+}
+// Choose a mode, then a seat (seats play in order, Blue first), then the game starts.
+async function chooseMode(name) {
+  document.querySelectorAll("[data-mode]").forEach(b => b.classList.toggle("cur", b.dataset.mode === name));
+  $("loading").textContent = "Loading the network…";
+  const { manifest, weights } = await load(name);
+  $("loading").textContent = "";
+  current = name;
+  session = new Session(engine, weights, tables, { players: manifest.players, rules: manifest.rules, temperature: 0.8 });
+  const order = ["1st", "2nd", "3rd", "4th"];
+  $("seatbuttons").replaceChildren(...Array.from({ length: manifest.players }, (_, s) =>
+    el("button", { on: { click: () => begin(s) } }, [el("i", { style: `background:${COLORS[s]}` }), NAMES[s], el("small", { text: `plays ${order[s]}` })])),
+    el("button", { on: { click: () => begin(null) } }, ["Random", el("small", { text: "any seat" })]));
+  $("seatpick").style.display = "block";
+}
+function begin(seat) { $("start").style.display = "none"; newGame(seat); }
+document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => chooseMode(b.dataset.mode)));
+const showStart = () => { clearTimeout(timer); $("over").style.display = "none"; $("loading").textContent = ""; $("seatpick").style.display = "none";
+  document.querySelectorAll("[data-mode]").forEach(b => b.classList.remove("cur")); $("start").style.display = "grid"; };
+
+// ---- Moves: yours by clicking, the network's on a timer.
+let shown = 0, darkened = { hexes: [], until: 0 };
+function refresh() {
+  view = session.view();
+  const fresh = view.payouts.filter(p => p.id > shown);
+  fresh.forEach(p => { if (p.hexes.length) { darkened = { hexes: p.hexes, until: Date.now() + 1400 }; setTimeout(() => view && render(), 1450); } });
+  render();
+  fresh.forEach(fly);
+  if (view.payouts.length) shown = Math.max(shown, view.payouts[view.payouts.length - 1].id);
+}
+const RESOURCE_OF = { hills: 0, forest: 1, pasture: 2, fields: 3, mountains: 4 };
+// Cards travel from each hex that paid to whoever received them: your hand, or the player's row on the right.
+function fly(payout) {
+  const svg = $("board"), ctm = svg.getScreenCTM(), g = view.geometry;
+  let k = 0;
+  payout.cards.forEach(({ seat, hex, resource, count }) => {
+    const target = seat === view.human ? $("hand").children[resource] : document.querySelector(`.player[data-seat="${seat}"]`);
+    if (!target) return;
+    const to = target.getBoundingClientRect(), from = new DOMPoint(...pt(g.hexes[hex])).matrixTransform(ctm);
+    for (let c = 0; c < count; c++, k++) {
+      const card = el("div", { class: `fly ${RES[resource]}`, style: `left:${from.x - 11}px;top:${from.y - 15}px` });
+      document.body.append(card);
+      const delay = 400 + 220 * k;
+      // Fly to the centre of the card in the hand (or the player's row), arrive solid, then hand over to it.
+      setTimeout(() => { card.style.transform = `translate(${to.left + to.width / 2 - from.x}px, ${to.top + to.height / 2 - from.y}px) scale(${seat === view.human ? 1.15 : 0.7})`; }, delay);
+      setTimeout(() => { card.style.opacity = 0; const t = seat === view.human ? $("hand").children[resource] : target; if (t) { t.classList.remove("got"); void t.offsetWidth; t.classList.add("got"); } }, delay + 1300);
+      setTimeout(() => card.remove(), delay + 1600);
+    }
+  });
+}
+function act(code, deal) {
+  if (busy) return;
+  try { session.act(code, deal); mode = null; bankGive = null; refresh(); } catch (e) { console.warn(e); }
+  schedule();
+}
+function schedule() {
+  clearTimeout(timer);
+  if (!view || view.winner != null || view.toAct == null || view.toAct === view.human) return;
+  timer = setTimeout(() => {
+    busy = true;
+    try { session.step(); refresh(); } catch (e) { console.warn(e); }
+    busy = false;
+    schedule();
+  }, +$("pace").value);
+}
+
+// ---- The board.
+function drawBoard() {
+  const svg = $("board"), g = view.geometry, b = view.board;
+  svg.replaceChildren();
+  const vs = g.vertices.map(pt), hs = g.hexes.map(pt);
+  const xs = vs.map(p => p[0]), ys = vs.map(p => p[1]), pad = R * 1.2;
+  svg.setAttribute("viewBox", `${Math.min(...xs) - pad} ${Math.min(...ys) - pad} ${Math.max(...xs) - Math.min(...xs) + 2 * pad} ${Math.max(...ys) - Math.min(...ys) + 2 * pad}`);
+  g.corners.forEach((corners, h) => svg.append(el("svg:polygon", { points: corners.map(v => vs[v].join(",")).join(" "), fill: TERRAIN[b.terrain[h]], stroke: "#fff", "stroke-width": 4 })));
+  for (const e of g.coast) {
+    const [a, c] = g.edges[e], ha = b.harbors[a];
+    if (!ha || ha !== b.harbors[c]) continue;
+    const mx = (vs[a][0] + vs[c][0]) / 2, my = (vs[a][1] + vs[c][1]) / 2, len = Math.hypot(mx, my), ox = mx + mx / len * R * .62, oy = my + my / len * R * .62;
+    for (const v of [a, c]) svg.append(el("svg:line", { x1: vs[v][0], y1: vs[v][1], x2: ox, y2: oy, stroke: "#94a3b8", "stroke-width": 2 }));
+    svg.append(el("svg:rect", { x: ox - 21, y: oy - 11, width: 42, height: 22, rx: 11, fill: ha === "3:1" ? "#fff" : TERRAIN[{ brick: "hills", lumber: "forest", wool: "pasture", grain: "fields", ore: "mountains" }[ha]], stroke: "#64748b" }));
+    svg.append(el("svg:text", { x: ox, y: oy + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 600, fill: "#111", text: ha === "3:1" ? "3:1" : "2:1" }));
+  }
+  b.tokens.forEach((n, h) => {
+    const [x, y] = hs[h];
+    if (n) {
+      svg.append(el("svg:circle", { cx: x, cy: y, r: 17, fill: "#fff" }));
+      const hot = n === 6 || n === 8, pips = 6 - Math.abs(7 - n);
+      svg.append(el("svg:text", { x, y: y + 3, "text-anchor": "middle", "font-size": 18, "font-weight": 700, fill: hot ? "#b91c1c" : "#111", text: n }));
+      for (let i = 0; i < pips; i++) svg.append(el("svg:circle", { cx: x + (i - (pips - 1) / 2) * 4.6, cy: y + 10, r: 1.7, fill: hot ? "#b91c1c" : "#111" }));
+    }
+    if (h === b.robber) {
+      svg.append(el("svg:rect", { x: x + 18, y: y - 11, width: 22, height: 22, rx: 4, fill: "#1f2937" }));
+      svg.append(el("svg:text", { x: x + 29, y: y + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: "#fff", text: "R" }));
+    }
+  });
+  if (Date.now() < darkened.until) darkened.hexes.forEach(h => svg.append(el("svg:polygon", { points: g.corners[h].map(v => vs[v].join(",")).join(" "), fill: "#111", opacity: 0.35, "pointer-events": "none" })));
+  const pick = kind => yours() ? movesOf(kind) : [];
+  const showing = kind => mode === kind || ["place settlement", "place road", "move robber", "road building"].includes(view.phase);
+  if (showing("robber")) for (const m of pick("robber")) svg.append(el("svg:polygon", { points: g.corners[m.hex].map(v => vs[v].join(",")).join(" "),
+    fill: "rgba(17,17,17,0.08)", stroke: "#111", "stroke-width": 3, class: "target", on: { click: () => act(m.code) } }));
+  for (const r of b.roads) {
+    const [a, c] = g.edges[r.edge];
+    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: "#fff", "stroke-width": 12, "stroke-linecap": "round" }));
+    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: COLORS[r.seat], "stroke-width": 8, "stroke-linecap": "round" }));
+  }
+  if (showing("road")) for (const m of pick("road")) {
+    const [a, c] = g.edges[m.edge];
+    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: COLORS[view.human], "stroke-width": 8, "stroke-linecap": "round", opacity: 0.35, class: "target", on: { click: () => act(m.code) } }));
+  }
+  for (const s of b.settlements) { const [x, y] = vs[s.vertex]; svg.append(el("svg:circle", { cx: x, cy: y, r: 10, fill: COLORS[s.seat], stroke: "#fff", "stroke-width": 3 })); }
+  for (const c of b.cities) { const [x, y] = vs[c.vertex]; svg.append(el("svg:rect", { x: x - 13, y: y - 13, width: 26, height: 26, rx: 4, fill: COLORS[c.seat], stroke: "#fff", "stroke-width": 3 })); }
+  for (const kind of ["settlement", "city"]) if (showing(kind)) for (const m of pick(kind)) {
+    const [x, y] = vs[m.vertex];
+    svg.append(el("svg:circle", { cx: x, cy: y, r: kind === "city" ? 17 : 11, fill: "rgba(255,255,255,0.75)", stroke: COLORS[view.human], "stroke-width": 3, class: "target", on: { click: () => act(m.code) } }));
+  }
+}
+
+function drawPlayers() {
+  $("players").replaceChildren(...view.seats.map(s => el("div", { class: "player" + (s.seat === view.current ? " current" : ""), "data-seat": s.seat }, [
+    el("div", { class: "dot", style: `background:${COLORS[s.seat]}` }),
+    el("div", {}, [
+      el("div", { class: "pname", text: s.you ? `You (${s.name})` : s.name }),
+      el("div", { class: "pstats" }, [
+        el("span", { text: `${s.cards} cards` }), el("span", { text: `${s.devCards} dev` }), el("span", { text: `${s.knights} kn` }), el("span", { text: `road ${s.roadLength}` }),
+        s.longestRoad ? el("span", { class: "badge", text: "longest road" }) : null, s.largestArmy ? el("span", { class: "badge", text: "largest army" }) : null,
+      ]),
+    ]),
+    el("div", { class: "vp", text: s.points }),
+  ])));
+}
+
+function drawLog() {
+  const box = $("log"), atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
+  box.replaceChildren(...view.events.map(e => e.seat == null ? el("div", { class: "event", style: "color:var(--muted)", text: e.text })
+    : el("div", { class: "event" }, [el("span", { class: "who", style: `color:${COLORS[e.seat]}`, text: who(e.seat) + " " }), e.text])));
+  if (atBottom) box.scrollTop = box.scrollHeight;
+}
+
+function card(cls, count, label, attrs = {}) {
+  return el("div", { class: `card ${cls}`, ...attrs }, [el("div", { class: "count", text: count }), el("div", { class: "label", text: label })]);
+}
+function drawHand() {
+  const box = $("hand");
+  box.replaceChildren();
+  const discard = yours() && view.phase === "discard";
+  if (!discard) chosen = [0, 0, 0, 0, 0];
+  const owed = discard ? view.count : 0, picked = chosen.reduce((a, b) => a + b, 0);
+  view.hand.forEach((n, r) => {
+    const left = n - chosen[r], can = discard && left > 0 && picked < owed;
+    const c = card(RES[r] + (can ? " clickable" : "") + (left ? "" : " faded"), left, RES[r]);
+    if (can) c.addEventListener("click", () => { chosen[r] += 1; render(); });
+    box.append(c);
+  });
+  if (discard) box.append(el("div", { class: "discarding" }, [
+    el("div", { class: "result", style: "margin:0", text: `Discard ${owed}: ${picked} chosen` }),
+    el("div", { class: "tiles" }, chosen.flatMap((n, r) => n ? [el("div", { class: `tile ${RES[r]}`, title: "put back", style: "cursor:pointer", on: { click: () => { chosen[r] -= 1; render(); } } }, [n > 1 ? el("b", { text: n }) : null])] : [])),
+    fix(el("button", { class: "primary", text: "Discard", on: { click: discardChosen } }), picked === owed),
+  ]));
+  DEV.forEach(([name, label, kind], c) => {
+    const n = view.devCards[c];
+    if (!n) return;
+    const m = kind && yours() ? moveOf(kind) : null;
+    const d = card("dev" + (m ? " clickable" : ""), n, label, { title: m ? `Play ${name}` : name });
+    if (m) d.addEventListener("click", () => act(m.code));
+    box.append(d);
+  });
+}
+function discardChosen() {
+  const target = view.hand.map((n, r) => n - chosen[r]);
+  chosen = [0, 0, 0, 0, 0];
+  while (view.toAct === view.human && view.phase === "discard") {
+    const r = view.hand.findIndex((n, i) => n > target[i]), m = r >= 0 ? moveOf("pick resource", x => x.resource === RES[r]) : null;
+    if (!m) break;
+    act(m.code);
+  }
+}
+function fix(button, enabled) { button.disabled = !enabled; return button; }
+function tool(label, kind, onClick, active = false) {
+  return fix(el("button", { class: active ? "active" : "", text: label, on: { click: onClick } }), yours() && movesOf(kind).length > 0);
+}
+
+function drawActions() {
+  const box = $("actions");
+  box.replaceChildren();
+  const toggle = kind => () => { mode = mode === kind ? null : kind; render(); };
+  const one = kind => () => { const m = moveOf(kind); if (m) act(m.code); };
+  if (view.rules.trading) box.append(tool("Trade", "offer", () => { mode = mode === "offer" ? null : "offer"; give = [0, 0, 0, 0, 0]; get = [0, 0, 0, 0, 0]; render(); }, mode === "offer"));
+  box.append(tool("Bank", "bank trade", () => { mode = mode === "bank" ? null : "bank"; bankGive = null; render(); }, mode === "bank"),
+    tool("Road", "road", toggle("road"), mode === "road"), tool("Settlement", "settlement", toggle("settlement"), mode === "settlement"),
+    tool("City", "city", toggle("city"), mode === "city"), tool("Dev card", "buy card", one("buy card")));
+  const roll = yours() ? moveOf("roll") : null, end = yours() ? moveOf("end turn") : null;
+  const main = el("button", { class: "primary", text: roll ? "Roll" : "End turn", on: { click: () => { const m = roll || end; if (m) act(m.code); } } });
+  main.disabled = !(roll || end);
+  box.append(main);
+}
+
+function drawTrade() {
+  const box = $("trade");
+  box.replaceChildren();
+  let show = false;
+  const building = yours() && ((mode === "offer" && moveOf("offer")) || (mode === "counter" && moveOf("counter")));
+  if (building) {
+    show = true;
+    const counter = mode === "counter", startMove = moveOf(mode);
+    box.append(el("h3", { text: counter ? "Your counter-offer" : "Make an offer" }));
+    const room = counts => 4 - counts.reduce((a, b) => a + b, 0);
+    const row = (label, counts, other, limit) => el("div", { class: "row" }, [el("span", { class: "what", text: label }), ...RES.map((r, i) => {
+      const can = counts[i] < limit(i);
+      return el("div", { class: "builder" }, [
+        el("div", { class: `chip ${r}` + (can ? "" : " off"), title: `add ${r}`, on: can ? { click: () => { counts[i] += 1; other[i] = 0; render(); } } : {} }, [el("span", { text: r }), el("span", { class: "n", text: counts[i] || "" })]),
+        counts[i] ? el("button", { class: "minus", text: "−", on: { click: () => { counts[i] -= 1; render(); } } }) : el("span", { class: "minus-space" }),
+      ]);
+    })]);
+    box.append(row("You give", give, get, i => Math.min(view.hand[i], give[i] + room(give))), row("You get", get, give, i => Math.min(19 - view.hand[i], get[i] + room(get))));
+    const signed = RES.map((_, i) => get[i] - give[i]), gives = give.some(n => n), asks = get.some(n => n);
+    const repeat = view.forbidden.some(f => f.every((n, i) => n === signed[i]));
+    const ready = gives && asks && !repeat;
+    const why = repeat ? (counter ? "That just accepts the offer" : "You already made that offer this turn") : !ready ? "A deal gives something and asks for something" : "";
+    box.append(el("div", { class: "row" }, [
+      fix(el("button", { class: "primary", text: counter ? "Send counter" : "Propose", on: { click: () => act(startMove.code, signed) } }), ready),
+      el("button", { text: "Clear", on: { click: () => { give.fill(0); get.fill(0); render(); } } }),
+      el("button", { text: "Close", on: { click: () => { mode = null; render(); } } }),
+      el("span", { style: "color:var(--muted);font-size:11.5px", text: why || (counter ? "" : `${view.trade.budgetLeft} moves left this turn`) }),
+    ]));
+  } else if (mode === "bank" && yours()) {
+    show = true;
+    const pairs = movesOf("bank trade"), gives = RES.filter(r => pairs.some(m => m.give === r));
+    box.append(el("h3", { text: "Trade with the bank" }));
+    box.append(el("div", { class: "row" }, [el("span", { class: "what", text: "Give" }), ...RES.map((r, i) =>
+      el("div", { class: `chip ${r}` + (gives.includes(r) ? "" : " off") + (bankGive === r ? " picked" : ""), on: gives.includes(r) ? { click: () => { bankGive = r; render(); } } : {} },
+        [el("span", { text: r }), el("span", { class: "n", text: view.rates[i] + ":1" })]))]));
+    box.append(el("div", { class: "row" }, [el("span", { class: "what", text: "Get" }), ...RES.map(r => {
+      const m = bankGive && pairs.find(x => x.give === bankGive && x.get === r);
+      return el("div", { class: `chip ${r}` + (m ? "" : " off"), on: m ? { click: () => act(m.code) } : {} }, [el("span", { text: r })]);
+    })]));
+  }
+  box.style.display = show ? "block" : "none";
+}
+
+function tiles(counts) {
+  if (!counts.some(n => n)) return el("div", { class: "tiles" }, [el("div", { class: "tile any", text: "anything" })]);
+  return el("div", { class: "tiles" }, counts.flatMap((n, r) => n ? [el("div", { class: `tile ${RES[r]}`, title: RES[r] }, [n > 1 ? el("b", { text: n }) : null])] : []));
+}
+const name = seat => el("span", { class: "seat-name", style: `color:${COLORS[seat]}`, text: who(seat) });
+
+function drawOffer() {
+  const box = $("offer"), b = view.offerBoard;
+  box.replaceChildren();
+  const key = b && JSON.stringify([b.proposer, b.give, b.get]);
+  if (!b || dismissed === key) { box.style.display = "none"; return; }
+  const mine = b.proposer === view.human, live = !b.result, confirming = live && yours() && view.phase === "confirm";
+  const cancel = confirming ? moveOf("cancel") : null;
+  box.append(el("div", { class: "offer-head" }, [
+    name(b.proposer),
+    el("div", { class: "offer-side" }, [el("small", { text: mine ? "you give" : "gives" }), tiles(b.give)]),
+    el("div", { class: "swap", text: "⇄" }),
+    el("div", { class: "offer-side" }, [el("small", { text: mine ? "you get" : "wants" }), tiles(b.get)]),
+    el("span", { style: "flex:1" }),
+    cancel ? el("button", { class: "x", title: "Call off the trade", text: "✕", on: { click: () => act(cancel.code) } })
+      : !live ? el("button", { class: "x", title: "Close", text: "✕", on: { click: () => { dismissed = key; render(); } } }) : null,
+  ]));
+  const list = el("div", { class: "responses" });
+  for (const a of b.answers) {
+    const trade = confirming ? moveOf("trade with", m => m.seat === a.seat) : null, take = confirming ? moveOf("take counter", m => m.seat === a.seat) : null;
+    const done = b.partner === a.seat;
+    let mark;
+    if (a.status === "accepted" && trade) mark = el("button", { class: "mark yes", title: `Trade with ${who(a.seat)}`, text: "✓", on: { click: () => act(trade.code) } });
+    else if (a.status === "accepted") mark = el("div", { class: "mark yes", text: "✓" });
+    else if (a.status === "declined" || a.status === "countered") mark = el("div", { class: "mark no", text: "✕" });
+    else mark = el("div", { class: "mark wait", text: "…" });
+    list.append(el("div", { class: "response" }, [mark, name(a.seat), a.status === "countered" ? el("small", { style: "color:var(--muted)", text: "countered" }) : null]));
+    if (a.counter) {
+      const you = a.seat === view.human;
+      list.append(el("div", { class: "counter-offer" }, [
+        el("div", { class: "offer-side" }, [el("small", { text: you ? "you give" : "gives" }), tiles(a.counter.give)]),
+        el("div", { class: "swap", text: "⇄" }),
+        el("div", { class: "offer-side" }, [el("small", { text: you ? "you get" : "wants" }), tiles(a.counter.get)]),
+        take ? el("button", { class: "mark yes", title: "Accept this counter-offer", text: "✓", on: { click: () => act(take.code) } })
+          : el("div", { class: "mark " + (done ? "yes" : b.result ? "no" : "wait"), text: done ? "✓" : b.result ? "✕" : "…" }),
+      ]));
+    }
+  }
+  box.append(list);
+  if (live && yours() && view.phase === "respond" && mode !== "counter") {
+    const [accept, decline, counter] = ["accept", "decline", "counter"].map(k => moveOf(k));
+    box.append(el("div", { class: "choices" }, [
+      accept ? el("button", { class: "mark yes", title: "Accept", text: "✓", on: { click: () => act(accept.code) } }) : null,
+      decline ? el("button", { class: "mark no", title: "Decline", text: "✕", on: { click: () => act(decline.code) } }) : null,
+      counter ? el("button", { text: "Counter", on: { click: () => { mode = "counter"; give = [0, 0, 0, 0, 0]; get = [0, 0, 0, 0, 0]; render(); } } }) : null,
+      accept ? null : el("span", { class: "result", style: "margin:0", text: "You don't have the cards to accept" }),
+    ]));
+  }
+  if (b.result) box.append(el("div", { class: "result", text: `${who(b.proposer)} ${b.result}` }));
+  box.style.display = "block";
+}
+
+function drawBanner() {
+  const box = $("banner");
+  box.replaceChildren();
+  let text = null, extra = [];
+  if (view.winner == null && view.toAct != null && view.toAct !== view.human) text = `${who(view.toAct)} is thinking…`;
+  if (yours()) {
+    const phase = view.phase;
+    text = { "place settlement": "Place a settlement", "place road": "Place a road", "move robber": "Move the robber", "road building": "Place a free road",
+      discard: `Choose ${view.count} cards to discard`, "year of plenty": "Take a resource from the bank", monopoly: "Name a resource to monopolize",
+      "choose victim": "Choose whom to rob" }[phase] || (mode && !["offer", "counter", "bank"].includes(mode) ? `Choose where to build a ${mode}` : null);
+    if (phase === "year of plenty" || phase === "monopoly") extra = movesOf("pick resource").map(m => el("button", { text: m.resource, on: { click: () => act(m.code) } }));
+    if (phase === "choose victim") extra = movesOf("rob").map(m => el("button", { style: `color:${COLORS[m.seat]}`, text: who(m.seat), on: { click: () => act(m.code) } }));
+  }
+  box.replaceChildren(...(text ? [el("span", { text })] : []), ...extra);
+  box.style.display = text ? "flex" : "none";
+}
+
+function render() {
+  if (!view) return;
+  const r = view.rules;
+  $("rules").textContent = `${view.players === 2 ? "1 v 1" : "4 players"} · first to ${r.points} · discard over ${r.discardLimit}` + (r.friendlyRobber ? " · friendly robber" : "") + (r.balancedDice ? " · balanced dice" : "") + (r.trading ? "" : " · no player trades");
+  $("rollsum").textContent = view.lastRoll ?? "–";
+  $("stock").replaceChildren(...view.bank.map((n, r) => el("div", { class: RES[r], title: `${n} ${RES[r]} left in the bank`, text: n })),
+    el("div", { class: "dev", title: `${view.deck} development cards left`, text: view.deck }));
+  drawBoard(); drawPlayers(); drawLog(); drawHand(); drawActions(); drawTrade(); drawOffer(); drawBanner();
+  if (view.winner != null) { $("winner").textContent = view.winner === view.human ? "You won!" : `${who(view.winner)} won`; $("over").style.display = "grid"; }
+  else $("over").style.display = "none";
+}
+
+function newGame(seat) { clearTimeout(timer); session.new(undefined, seat ?? undefined); mode = null; dismissed = null; view = null; shown = 0; refresh(); schedule(); }
+$("newgame").onclick = showStart;
+$("again").onclick = showStart;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && view) { mode = null; render(); } });
+const auto = new URLSearchParams(location.search).get("mode");
+showStart();
+if (auto === "2p" || auto === "4p") chooseMode(auto).then(() => begin(0));
+</script>
+</body>
+</html>

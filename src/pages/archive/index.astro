@@ -1,0 +1,66 @@
+---
+import { getCollection } from "astro:content";
+import ConstrainedWidthLayout from "@/layouts/ConstrainedWidthLayout.astro";
+import { postDateCompareReverse, isoDate } from "@/utils";
+
+const allPosts = await getCollection("post");
+const years = [
+    ...new Set(allPosts.map((post) => post.data.created_at.getFullYear())),
+].sort((a, b) => b - a);
+
+const postByYear = years.map((year) => ({
+    year,
+    posts: allPosts
+        .filter((post) => post.data.created_at.getFullYear() === year)
+        .sort(postDateCompareReverse),
+}));
+---
+
+<ConstrainedWidthLayout title="Archive">
+    <div class="my-5">
+        <h1 class="mb-10">Archive</h1>
+        <div class="">
+            {
+                postByYear.map(({ year, posts }, i) => (
+                    <div class="grid grid-cols-1a1">
+                        <div class="left">
+                            {i % 2 === 0 && (
+                                <h2 class="flex justify-end">{year}</h2>
+                                <ul class="grid justify-end gap-0.5">
+                                    {posts.map((post) => (
+                                        <li class="flex flex-wrap space-x-4 justify-end">
+                                            <a href={`/post/${post.slug}`}>
+                                                {post.data.title}
+                                            </a>
+                                            <span class="my-auto">
+                                                {isoDate(post.data.created_at)}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        <div class="boundary w-0.5 bg-pixel-primary dark:bg-pixel-dark-primary mx-10" />
+                        <div class="right ">
+                            {i % 2 === 1 && (
+                                <h2 class="flex justify-start">{year}</h2>
+                                <ul class="grid justify-start gap-0.5">
+                                    {posts.map((post) => (
+                                        <li class="flex flex-wrap space-x-4 justify-start">
+                                            <span class="my-auto">
+                                                {isoDate(post.data.created_at)}
+                                            </span>
+                                            <a href={`/post/${post.slug}`}>
+                                                {post.data.title}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    </div>
+</ConstrainedWidthLayout>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catan embed</title>
+<style>
+* { box-sizing: border-box; }
+html, body { overflow: hidden; }
+body { margin: 0; padding: 8px; background: transparent; color: #1f2937; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+svg { width: 100%; max-width: 760px; display: block; margin: 0 auto; }
+svg text { font: 11.5px system-ui, -apple-system, "Segoe UI", sans-serif; fill: #4b5563; }
+svg text.dim { font: 10.5px ui-monospace, Menlo, monospace; fill: #9ca3af; }
+svg text.big { font: 600 12px ui-monospace, Menlo, monospace; fill: #111; }
+.kind { cursor: default; transition: opacity .2s; }
+svg.hover .kind { opacity: .25; }
+svg.hover .kind.on { opacity: 1; }
+svg.hover .kind.on text { fill: #111; font-weight: 700; }
+</style>
+</head>
+<body>
+<svg id="fig"></svg>
+<script>
+// Each kind of piece: how many rows it has and how many numbers per row, in the order they are stacked.
+const KINDS = [
+  { name: "Summary", rows: 1, cols: 203, color: "#78716c" },
+  { name: "Players", rows: 4, cols: 48, color: "#2563eb" },
+  { name: "Resources", rows: 5, cols: 27, color: "#0891b2" },
+  { name: "Hexes", rows: 19, cols: 29, color: "#d97706" },
+  { name: "Corners", rows: 54, cols: 33, color: "#059669" },
+  { name: "Edges", rows: 72, cols: 16, color: "#7c3aed" }
+];
+const WIDTH = 128, ROW = 2.2, COL = 1.05, GAP = 26;
+const LX = 116, PX = 380, RX = 560, TOP = 40;
+const NS = "http://www.w3.org/2000/svg", fig = document.getElementById("fig");
+function add(parent, tag, attrs, text) {
+  const node = document.createElementNS(NS, tag);
+  for (const k in attrs) node.setAttribute(k, attrs[k]);
+  if (text !== undefined) node.textContent = text;
+  parent.appendChild(node);
+  return node;
+}
+const tint = (c, p) => `color-mix(in srgb, ${c} ${p}%, transparent)`;
+// A matrix, drawn to scale: one unit of height per row, one unit of width per number in the row.
+function matrix(g, x, y, cols, rows, color, strong) {
+  add(g, "rect", { x, y, width: cols * COL, height: rows * ROW, rx: 1.5, fill: strong ? color : tint(color, 40), stroke: color, "stroke-width": strong ? 0 : 1 });
+}
+
+const total = KINDS.reduce((s, k) => s + k.rows, 0);
+const leftHeight = total * ROW + GAP * (KINDS.length - 1);
+const rightTop = TOP + (leftHeight - total * ROW) / 2;
+let ly = TOP, ry = rightTop;
+add(fig, "text", { x: LX, y: 12, class: "dim" }, "unpacked");
+add(fig, "text", { x: PX, y: 12, "text-anchor": "middle", class: "dim" }, "× its own learned matrix");
+add(fig, "text", { x: RX, y: 12, class: "dim" }, "stacked");
+KINDS.forEach((k, i) => {
+  const g = add(fig, "g", { class: "kind" });
+  const h = k.rows * ROW, lmid = ly + h / 2, rmid = ry + h / 2;
+  // Unpacked, each its own width.
+  add(g, "text", { x: LX - 10, y: lmid - 1, "text-anchor": "end" }, k.name);
+  add(g, "text", { x: LX - 10, y: lmid + 11, "text-anchor": "end", class: "dim" }, `${k.rows} × ${k.cols}`);
+  matrix(g, LX, ly, k.cols, k.rows, k.color, false);
+  // Its own learned matrix.
+  const label = `${k.cols} × ${WIDTH}`, pw = 68, py = lmid;
+  add(g, "line", { x1: LX + k.cols * COL + 6, y1: lmid, x2: PX - pw / 2 - 4, y2: py, stroke: "#d1d5db", "stroke-width": 1.2 });
+  add(g, "rect", { x: PX - pw / 2, y: py - 9, width: pw, height: 18, rx: 4, fill: "#fff", stroke: k.color, "stroke-width": 1.2 });
+  add(g, "text", { x: PX, y: py + 4, "text-anchor": "middle", class: "dim", style: `fill:${k.color}` }, label);
+  add(g, "path", { d: `M${PX + pw / 2 + 4},${py} C${(PX + RX) / 2 + 20},${py} ${(PX + RX) / 2 - 20},${rmid} ${RX - 8},${rmid}`, fill: "none", stroke: "#d1d5db", "stroke-width": 1.2 });
+  add(g, "path", { d: `M${RX - 8},${rmid - 3} L${RX - 3},${rmid} L${RX - 8},${rmid + 3}`, fill: "none", stroke: "#9ca3af", "stroke-width": 1.2 });
+  // Now 128 wide, stacked.
+  matrix(g, RX, ry, WIDTH, k.rows, k.color, true);
+  g.addEventListener("mouseenter", () => { fig.classList.add("hover"); g.classList.add("on"); });
+  g.addEventListener("mouseleave", () => { fig.classList.remove("hover"); g.classList.remove("on"); });
+  ly += h + GAP;
+  ry += h;
+});
+// The single grid.
+const gx = RX + WIDTH * COL + 10;
+add(fig, "path", { d: `M${gx},${rightTop} h5 V${ry} h-5`, fill: "none", stroke: "#9ca3af", "stroke-width": 1.2 });
+add(fig, "text", { x: gx + 12, y: (rightTop + ry) / 2 + 4, class: "big" }, `${total} × ${WIDTH}`);
+fig.setAttribute("viewBox", `0 0 ${gx + 90} ${ly - GAP + 8}`);
+
+if (window.frameElement) {
+  new ResizeObserver(() => { window.frameElement.style.height = document.body.offsetHeight + "px"; }).observe(document.body);
+}
+</script>
+</body>
+</html>

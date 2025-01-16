@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catan decode</title>
+<style>
+* { box-sizing: border-box; }
+html, body { overflow: hidden; }
+body { margin: 0; padding: 8px; background: transparent; color: #1f2937; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.wrap { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.left { flex: 0 1 350px; min-width: 300px; }
+.right { flex: 1 1 480px; min-width: 0; }
+svg { width: 82%; display: block; margin: 0 auto 6px; }
+.head { font-weight: 600; margin-bottom: 6px; }
+.swatch { display: inline-block; width: 9px; height: 9px; border-radius: 2px; background: var(--c); margin-right: 6px; vertical-align: 0; }
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; margin-bottom: 6px; font-size: 12px; color: #4b5563; }
+.bytes { display: grid; grid-template-columns: repeat(21, 1fr); gap: 2px; }
+.bytes div, .mx div, .sg div { border-radius: 2px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: color-mix(in srgb, var(--c) 16%, transparent); color: #fff; font: 600 8px/1 ui-monospace, Menlo, monospace; letter-spacing: -.04em; cursor: default; }
+.bytes div { aspect-ratio: 1; border-radius: 3px; }
+.bytes div.n, .mx div.n, .sg div.n { background: var(--c); }
+.bytes div.dark, .mx div.dark, .sg div.dark { color: #111; }
+.bytes div.faint, .mx div.faint, .sg div.faint { color: #6b7280; }
+.bytes div.wide { font-size: 7px; }
+.mx div.faint, .sg div.faint { font-weight: 300; color: #a8aeb8; }
+.mx div.wide, .sg div.wide { font-size: 6.5px; letter-spacing: -.08em; }
+.bytes div.hl, .mx div.hl, .sg div.hl { outline: 2px solid #111; position: relative; z-index: 1; }
+.tabs { display: flex; flex-wrap: wrap; gap: 2px 12px; margin-bottom: 6px; font-size: 12px; color: #6b7280; }
+.tabs span { cursor: default; }
+.tabs span:hover, .tabs span.cur { color: #111; }
+.tabs span.cur { font-weight: 600; }
+.tabs b { font: 10.5px ui-monospace, Menlo, monospace; color: #9ca3af; margin-left: 3px; font-weight: 400; }
+.slot { display: inline-block; padding: 0 5px; border-radius: 4px; background: #fff; border: 1px solid #d1d5db; font-size: 12px; white-space: nowrap; cursor: default; }
+.slot:hover { border-color: #111; }
+.slot b { font-family: ui-monospace, Menlo, monospace; margin-left: 4px; font-weight: 400; color: #6b7280; }
+.slot.cur { background: #111; border-color: #111; color: #fff; }
+.slot.cur b { color: #d1d5db; }
+.slot i { font-style: normal; margin-left: 4px; padding: 0 4px; border-radius: 3px; background: #facc15; color: #111; font-size: 11px; }
+.mats { display: flex; gap: 36px; align-items: flex-start; padding-right: 32px; }
+.mats > .mx { flex: 1 1 0; }
+.mx { display: grid; gap: 1px; align-content: start; }
+.mx .rl.on { color: #111; font-weight: 700; }
+.mx .rl { font: 8px/1 ui-monospace, Menlo, monospace; color: #9ca3af; display: flex; align-items: center; justify-content: flex-end; padding-right: 3px; }
+.mx div.g0, .mx .ch.g0 { margin-left: 3px; }
+.sg { display: grid; gap: 1px; flex: 1 1 0; align-items: center; }
+.sm .sl { font-size: 11.5px; color: #4b5563; text-align: right; white-space: nowrap; padding-right: 8px; }
+.sm .sl.on { color: #111; font-weight: 700; }
+/* An invisible bold copy keeps each label as wide as its bold version, so bolding on hover doesn't shift the grid. */
+.sm .sl { display: inline-flex; flex-direction: column; align-items: flex-end; }
+.sm .sl::after { content: attr(data-text); font-weight: 700; height: 0; visibility: hidden; overflow: hidden; }
+.mx .ch { position: relative; height: 104px; }
+.mx .ch i { position: absolute; left: calc(50% - 3px); bottom: 3px; transform-origin: 0 50%; transform: rotate(-72deg); white-space: nowrap; font: 9.5px/1 system-ui, -apple-system, sans-serif; font-style: normal; color: #6b7280; }
+.mx .ch.on i { color: #111; font-weight: 700; }
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <svg id="board" viewBox="-320 -290 640 580"></svg>
+    <div class="legend" id="owners"></div>
+    <div class="bytes" id="bytes"></div>
+  </div>
+  <div class="right">
+    <div class="head">What the network unpacks</div>
+    <div class="tabs" id="tabs"></div>
+    <div class="mats" id="mats"></div>
+  </div>
+</div>
+<script>
+const HEXES=[[-2,-6,[0,1,2,3,4,5]],[0,-6,[6,7,8,9,2,1]],[2,-6,[10,11,12,13,8,7]],[-3,-3,[4,3,14,15,16,17]],[-1,-3,[2,9,18,19,14,3]],[1,-3,[8,13,20,21,18,9]],[3,-3,[12,22,23,24,20,13]],[-4,0,[16,15,25,26,27,28]],[-2,0,[14,19,29,30,25,15]],[0,0,[18,21,31,32,29,19]],[2,0,[20,24,33,34,31,21]],[4,0,[23,35,36,37,33,24]],[-3,3,[25,30,38,39,40,26]],[-1,3,[29,32,41,42,38,30]],[1,3,[31,34,43,44,41,32]],[3,3,[33,37,45,46,43,34]],[-2,6,[38,42,47,48,49,39]],[0,6,[41,44,50,51,47,42]],[2,6,[43,46,52,53,50,44]]];
+const VERTS=[[-2,-8],[-1,-7],[-1,-5],[-2,-4],[-3,-5],[-3,-7],[0,-8],[1,-7],[1,-5],[0,-4],[2,-8],[3,-7],[3,-5],[2,-4],[-2,-2],[-3,-1],[-4,-2],[-4,-4],[0,-2],[-1,-1],[2,-2],[1,-1],[4,-4],[4,-2],[3,-1],[-3,1],[-4,2],[-5,1],[-5,-1],[-1,1],[-2,2],[1,1],[0,2],[3,1],[2,2],[5,-1],[5,1],[4,2],[-2,4],[-3,5],[-4,4],[0,4],[-1,5],[2,4],[1,5],[4,4],[3,5],[-1,7],[-2,8],[-3,7],[1,7],[0,8],[3,7],[2,8]];
+const EDGES=[[0,1],[1,2],[2,3],[3,4],[4,5],[0,5],[6,7],[7,8],[8,9],[2,9],[1,6],[10,11],[11,12],[12,13],[8,13],[7,10],[3,14],[14,15],[15,16],[16,17],[4,17],[9,18],[18,19],[14,19],[13,20],[20,21],[18,21],[12,22],[22,23],[23,24],[20,24],[15,25],[25,26],[26,27],[27,28],[16,28],[19,29],[29,30],[25,30],[21,31],[31,32],[29,32],[24,33],[33,34],[31,34],[23,35],[35,36],[36,37],[33,37],[30,38],[38,39],[39,40],[26,40],[32,41],[41,42],[38,42],[34,43],[43,44],[41,44],[37,45],[45,46],[43,46],[42,47],[47,48],[48,49],[39,49],[44,50],[50,51],[47,51],[46,52],[52,53],[50,53]];
+
+const TERRAIN = [1, 2, 3, 0, 4, 2, 3, 1, 0, 3, 4, 1, 2, 4, 0, 3, 1, 2, 5];
+const TOKENS = [5, 2, 6, 3, 8, 10, 9, 12, 11, 4, 8, 10, 9, 4, 5, 6, 3, 11, 0];
+const HARBOR = [0,1,0,0,3,0,1,0,0,0,5,5,0,0,0,0,0,3,0,0,0,0,2,2,0,0,0,6,6,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0,0,1,0,4,0,0,0,4,1,1];
+
+const RES = ["brick", "lumber", "wool", "grain", "ore"];
+const RCOL = ["#cf7b57", "#6a9a6f", "#b5d99a", "#efd47a", "#aab0ba"];
+const TNAME = [...RES, "desert"];
+const TFILL = [...RCOL, "#ebe3cb"];
+const HCOL = c => c === 1 ? "#ffffff" : RCOL[c - 2];
+const HNAME = ["none", "3:1", ...RES.map(r => `2:1 ${r}`)];
+const CARDS = ["knight", "victory point", "road building", "year of plenty", "monopoly"];
+const SEAT = ["#2563eb", "#ea580c", "#16a34a", "#db2777"];
+const PNAME = ["P0", "P1", "P2", "P3"];
+const PHASES = ["PlaceSettlement", "PlaceRoad", "Turn", "Dice", "Discard", "MoveRobber", "Steal", "Draw", "RoadBuilding", "YearOfPlenty", "Monopoly", "Over", "ChooseVictim", "Respond", "Confirm", "Draft"];
+const NONE = 255;
+
+// Board shape: the 0/1 tables the network multiplies by.
+const range = (at, len) => Array.from({ length: len }, (_, k) => at + k);
+const sum = c => c.reduce((x, y) => x + y, 0);
+const edgesAt = VERTS.map((_, v) => EDGES.flatMap((e, i) => e.includes(v) ? [i] : []));
+const hexesAt = VERTS.map((_, v) => HEXES.flatMap(([, , c], h) => c.includes(v) ? [h] : []));
+const nextTo = VERTS.map((_, v) => edgesAt[v].map(e => EDGES[e].find(u => u !== v)));
+const touching = EDGES.map(([a, b], e) => [...edgesAt[a], ...edgesAt[b]].filter(f => f !== e));
+
+// The position from the state, filled out to four players.
+const G = {
+  players: 4, robber: 3,
+  settle: [new Set([18]), new Set([25, 47]), new Set([0, 35]), new Set([52])],
+  city: [new Set([44]), new Set(), new Set(), new Set([11])],
+  road: [new Set([21, 26, 54, 58]), new Set([31, 62, 68]), new Set([0, 45]), new Set([12, 69])],
+  hand: [0, 0, 0, 0, 5], aside: [0, 0, 0, 0, 0],
+  others: [
+    { sure: [2, 0, 0, 0, 4], held: 6, aside: 0, dev: 0, newDev: 0 },
+    { sure: [0, 1, 0, 1, 0], held: 4, aside: 0, dev: 1, newDev: 0 },
+    { sure: [1, 0, 0, 0, 0], held: 3, aside: 0, dev: 0, newDev: 0 }
+  ],
+  bank: [16, 17, 18, 17, 9], dev: [0, 1, 0, 0, 0], newDev: [0, 0, 0, 0, 0],
+  deck: 23, unseen: [14, 4, 2, 2, 2],
+  knights: [0, 0, 0, 0], roadLen: [0, 0, 0, 0], points: [0, 0, 0, 0], longest: -1, army: -1,
+  turn: 0, cardPlayed: 0, phase: 14, rolled: 1, owed: 0, who: NONE, corner: NONE, from: NONE,
+  // You offered 1 ore for 1 brick: P1 countered with 1 brick for 2 ore, P2 declined, P3 accepted.
+  offer: { give: [0, 0, 0, 0, 1], get: [1, 0, 0, 0, 0], made: 2, left: 12 },
+  answers: [{ status: 4, counter: { give: [1, 0, 0, 0, 0], get: [0, 0, 0, 0, 2] } }, { status: 3, counter: null }, { status: 2, counter: null }],
+  last: { give: [0, 0, 0, 0, 1], get: [0, 0, 1, 0, 0], acceptedBy: 0, counteredBy: 0, traded: 0 }
+};
+function roadLength(s) {
+  const blocked = new Set();
+  for (let o = 0; o < 4; o++) if (o !== s) [...G.settle[o], ...G.city[o]].forEach(v => blocked.add(v));
+  const walk = (at, used) => {
+    let best = 0;
+    for (const e of edgesAt[at]) {
+      if (!G.road[s].has(e) || used.has(e)) continue;
+      const to = EDGES[e].find(u => u !== at);
+      used.add(e);
+      best = Math.max(best, 1 + (blocked.has(to) ? 0 : walk(to, used)));
+      used.delete(e);
+    }
+    return best;
+  };
+  let best = 0;
+  G.road[s].forEach(e => EDGES[e].forEach(v => { best = Math.max(best, walk(v, new Set())); }));
+  return best;
+}
+G.roadLen = [0, 1, 2, 3].map(roadLength);
+G.points = [0, 1, 2, 3].map(s => G.settle[s].size + 2 * G.city[s].size + (s === 0 ? G.dev[1] : 0));
+// Each seat's bank rate per resource, from the harbors under its buildings; the friendly robber's protection.
+const rateOf = (s, r) => { const ports = [...G.settle[s], ...G.city[s]].map(v => HARBOR[v]); return ports.includes(2 + r) ? 2 : ports.includes(1) ? 3 : 4; };
+G.rates = RES.map((_, r) => rateOf(0, r));
+G.protected = [0, 1, 2, 3].map(s => +(s < G.players && s !== G.turn && G.points[s] - (s === 0 ? G.dev[1] : 0) <= 2));
+
+// The 369 numbers, exactly as in the state.
+function encode() {
+  const o = new Uint8Array(369);
+  const pack = (set, at) => set.forEach(i => { o[at + (i >> 3)] |= 1 << (i & 7); });
+  for (let s = 0; s < 4; s++) { pack(G.settle[s], 32 * s); pack(G.city[s], 32 * s + 8); pack(G.road[s], 32 * s + 16); }
+  o.set(TERRAIN, 128); o.set(TOKENS, 147); o.set(HARBOR, 166); o[220] = G.robber; o[221] = G.players;
+  o.set(G.hand, 222); o.set(G.aside, 227);
+  G.others.forEach((p, k) => { const at = 232 + 7 * k; o.set(p.sure, at); o[at + 5] = p.held; o[at + 6] = p.aside; o[268 + 2 * k] = p.dev; o[269 + 2 * k] = p.newDev; });
+  o.set(G.bank, 253); o.set(G.dev, 258); o.set(G.newDev, 263); o[274] = G.deck; o.set(G.unseen, 275);
+  o.set(G.knights, 280); o.set(G.roadLen, 284); o.set(G.points, 288); o[292] = G.longest + 1; o[293] = G.army + 1;
+  o[294] = G.turn; o[295] = G.cardPlayed; o[296] = G.phase; o[297] = G.rolled; o[298] = G.owed; o[299] = G.who; o[300] = G.corner; o[301] = G.from;
+  o.set(G.offer.give, 302); o.set(G.offer.get, 307);
+  G.answers.forEach((a, k) => {
+    const at = 312 + 11 * k;
+    o[at] = a.status;
+    if (a.counter) { o.set(a.counter.give, at + 1); o.set(a.counter.get, at + 6); }
+  });
+  o[345] = G.offer.made; o[346] = G.offer.left;
+  o.set(G.last.give, 347); o.set(G.last.get, 352); o[357] = G.last.acceptedBy; o[358] = G.last.counteredBy; o[359] = G.last.traded;
+  o.set(G.rates, 360); o.set(G.protected, 365);
+  return o;
+}
+const O = encode();
+
+// decode(), as in features.py. Each group is a run of columns: how each number is made, and which of the 369 it comes from.
+const bByte = (v, j) => j < 4 ? 32 * j + (v >> 3) : 32 * (j - 4) + 8 + (v >> 3);
+const rByte = (e, s) => 32 * s + 16 + (e >> 3);
+const building = (v, j) => (O[bByte(v, j)] >> (v & 7)) & 1;
+const road = (e, s) => (O[rByte(e, s)] >> (e & 7)) & 1;
+const BLD = [...PNAME.map(p => `${p} settlement`), ...PNAME.map(p => `${p} city`)];
+const pipsOf = t => t ? (6 - Math.abs(7 - t)) / 5 : 0;
+const list = (xs, p) => xs.map(x => p + x).join(", ");
+const shown = n => O[n] === NONE ? "255 (none)" : O[n];
+
+const HEX = [
+  { name: "terrain", cols: TNAME, val: (h, j) => +(O[128 + h] === j), src: h => [128 + h], how: h => `one-hot of number ${128 + h}, which is ${O[128 + h]} (${TNAME[O[128 + h]]})` },
+  { name: "dice number", cols: range(0, 13).map(t => t ? `${t}` : "none"), val: (h, j) => +(O[147 + h] === j), src: h => [147 + h], how: h => `one-hot of number ${147 + h}, which is ${O[147 + h]}` },
+  { name: "how often rolled", cols: [""], val: h => pipsOf(O[147 + h]), src: h => [147 + h], how: h => O[147 + h] ? `(6 − |7 − ${O[147 + h]}|) ÷ 5, from number ${147 + h}` : "the desert has no number, so 0" },
+  { name: "robber", cols: [""], val: h => +(O[220] === h), src: () => [220], how: h => `1 if number 220 (${O[220]}) is ${h}` },
+  { name: "buildings on its corners", cols: BLD, val: (h, j) => sum(HEXES[h][2].map(v => building(v, j))), src: (h, j) => HEXES[h][2].map(v => bByte(v, j)), how: (h, j) => `added up over its corners ${list(HEXES[h][2], "v")}`, marks: h => ({ v: HEXES[h][2] }) }
+];
+const CORNER = [
+  { name: "building here", cols: BLD, val: building, src: (v, j) => [bByte(v, j)], how: (v, j) => `bit ${v & 7} of number ${bByte(v, j)}, which is ${O[bByte(v, j)]}` },
+  { name: "harbor", cols: HNAME, val: (v, j) => +(O[166 + v] === j), src: v => [166 + v], how: v => `one-hot of number ${166 + v}, which is ${O[166 + v]} (${HNAME[O[166 + v]]})` },
+  { name: "setup road starts here", cols: [""], val: v => +(O[300] === v), src: () => [300], how: v => `1 if number 300 (${shown(300)}) is ${v}` },
+  { name: "production", cols: RES, val: (v, j) => sum(hexesAt[v].map(h => TERRAIN[h] === j ? pipsOf(TOKENS[h]) : 0)), src: v => hexesAt[v].flatMap(h => [128 + h, 147 + h]), how: v => `added up over its hexes ${list(hexesAt[v], "h")}: terrain × how often it's rolled`, marks: v => ({ h: hexesAt[v] }) },
+  { name: "buildings next door", cols: BLD, val: (v, j) => sum(nextTo[v].map(u => building(u, j))), src: (v, j) => nextTo[v].map(u => bByte(u, j)), how: v => `added up over its neighbors ${list(nextTo[v], "v")}`, marks: v => ({ v: nextTo[v] }) },
+  { name: "roads touching it", cols: PNAME.map(p => `${p} roads`), val: (v, s) => sum(edgesAt[v].map(e => road(e, s))), src: (v, s) => edgesAt[v].map(e => rByte(e, s)), how: v => `added up over its edges ${list(edgesAt[v], "e")}`, marks: v => ({ e: edgesAt[v] }) }
+];
+const EDGE = [
+  { name: "road here", cols: PNAME.map(p => `${p} road`), val: road, src: (e, s) => [rByte(e, s)], how: (e, s) => `bit ${e & 7} of number ${rByte(e, s)}, which is ${O[rByte(e, s)]}` },
+  { name: "buildings at its ends", cols: BLD, val: (e, j) => sum(EDGES[e].map(v => building(v, j))), src: (e, j) => EDGES[e].map(v => bByte(v, j)), how: e => `added up over its ends ${list(EDGES[e], "v")}`, marks: e => ({ v: EDGES[e] }) },
+  { name: "roads on touching edges", cols: PNAME.map(p => `${p} roads`), val: (e, s) => sum(touching[e].map(f => road(f, s))), src: (e, s) => touching[e].map(f => rByte(f, s)), how: e => `added up over the edges it touches ${list(touching[e], "e")}`, marks: e => ({ e: touching[e] }) }
+];
+
+// players(): one row per seat, the same 48 columns for everyone, as in features.py.
+const mine = r => O[222 + r] + O[227 + r];
+const of = (s, me, other) => s === 0 ? me : other(s - 1);
+const ANSWER = ["none", "to answer", "accepted", "declined", "countered"];
+const cardsOf = (s, r) => of(s, mine(r), k => O[232 + 7 * k + r]);
+const COSTS = [["road", [1, 1, 0, 0, 0]], ["settlement", [1, 1, 1, 1, 0]], ["city", [0, 0, 0, 2, 3]], ["dev card", [0, 0, 1, 1, 1]]];
+const portsOf = s => [...G.settle[s], ...G.city[s]].flatMap(v => [bByte(v, G.city[s].has(v) ? 4 + s : s), 166 + v]);
+const PLAYER = [
+  { name: "is me", cols: [""], val: s => +(s === 0), src: () => [], how: () => "1 for seat 0, the player deciding" },
+  { name: "in the game", cols: [""], val: s => +(s < O[221]), src: () => [221], how: s => `1 if ${s} is less than number 221 (${O[221]} players)` },
+  { name: "cards ÷ 10", cols: RES, val: (s, r) => cardsOf(s, r) / 10, src: (s, r) => of(s, [222 + r, 227 + r], k => [232 + 7 * k + r]), how: (s, r) => s ? `number ${232 + 7 * (s - 1) + r} ÷ 10: the ones you know they hold` : `(number ${222 + r} + number ${227 + r}) ÷ 10` },
+  { name: "hand size ÷ 10", cols: [""], val: s => of(s, sum(range(0, 5).map(mine)), k => O[237 + 7 * k]) / 10, src: s => of(s, range(222, 10), k => [237 + 7 * k]), how: s => s ? `number ${237 + 7 * (s - 1)} ÷ 10` : "numbers 222 to 231 added up, ÷ 10" },
+  { name: "set aside ÷ 10", cols: [""], val: s => of(s, sum(range(227, 5).map(n => O[n])), k => O[238 + 7 * k]) / 10, src: s => of(s, range(227, 5), k => [238 + 7 * k]), how: s => s ? `number ${238 + 7 * (s - 1)} ÷ 10` : "numbers 227 to 231 added up, ÷ 10" },
+  { name: "dev cards ÷ 5", cols: [""], val: s => of(s, sum(range(258, 5).map(n => O[n])), k => O[268 + 2 * k]) / 5, src: s => of(s, range(258, 5), k => [268 + 2 * k]), how: s => s ? `number ${268 + 2 * (s - 1)} ÷ 5` : "numbers 258 to 262 added up, ÷ 5" },
+  { name: "which dev cards ÷ 5", cols: CARDS, val: (s, c) => s ? 0 : O[258 + c] / 5, src: (s, c) => s ? [] : [258 + c], how: (s, c) => s ? "only known for yourself, so 0" : `number ${258 + c} ÷ 5` },
+  { name: "bought this turn", cols: [""], val: s => of(s, sum(range(263, 5).map(n => O[n])), k => O[269 + 2 * k]), src: s => of(s, range(263, 5), k => [269 + 2 * k]), how: s => s ? `number ${269 + 2 * (s - 1)}` : "numbers 263 to 267 added up" },
+  { name: "knights ÷ 5", cols: [""], val: s => O[280 + s] / 5, src: s => [280 + s], how: s => `number ${280 + s} ÷ 5` },
+  { name: "road length ÷ 15", cols: [""], val: s => O[284 + s] / 15, src: s => [284 + s], how: s => `number ${284 + s} (${O[284 + s]}) ÷ 15` },
+  { name: "points ÷ 15", cols: [""], val: s => O[288 + s] / 15, src: s => [288 + s], how: s => `number ${288 + s} (${O[288 + s]}) ÷ 15` },
+  { name: "whose turn", cols: [""], val: s => +(O[294] === s), src: () => [294], how: s => `1 if number 294 (${O[294]}) is ${s}` },
+  { name: "longest road", cols: [""], val: s => +(O[292] === s + 1), src: () => [292], how: s => `1 if number 292 (${O[292]}) is ${s + 1}` },
+  { name: "largest army", cols: [""], val: s => +(O[293] === s + 1), src: () => [293], how: s => `1 if number 293 (${O[293]}) is ${s + 1}` },
+  { name: "answer to the offer", cols: ANSWER, val: (s, j) => s ? +(Math.min(O[312 + 11 * (s - 1)], 4) === j) : 0, src: s => s ? [312 + 11 * (s - 1)] : [], how: s => s ? `one-hot of number ${312 + 11 * (s - 1)}, which is ${O[312 + 11 * (s - 1)]} (${ANSWER[O[312 + 11 * (s - 1)]]})` : "you don't answer your own offer, so 0" },
+  { name: "their counter-offer ÷ 4", cols: [...RES.map(r => `give ${r}`), ...RES.map(r => `get ${r}`)], val: (s, j) => s ? O[313 + 11 * (s - 1) + j] / 4 : 0, src: (s, j) => s ? [313 + 11 * (s - 1) + j] : [], how: (s, j) => s ? `number ${313 + 11 * (s - 1) + j} ÷ 4` : "you don't counter your own offer, so 0" },
+  { name: "phase is about them", cols: [""], val: s => +(O[299] === s), src: () => [299], how: s => `1 if number 299 (${shown(299)}) is ${s}` },
+  { name: "safe from the robber", cols: [""], val: s => O[365 + s], src: s => [365 + s], how: s => `number ${365 + s}` },
+  { name: "bank rate, (rate − 2) ÷ 2", cols: RES, val: (s, r) => (rateOf(s, r) - 2) / 2, src: s => portsOf(s), how: (s, r) => `${rateOf(s, r)}:1, from the harbors under their buildings` },
+  { name: "cards short ÷ 5", cols: COSTS.map(([n]) => n), val: (s, j) => sum(COSTS[j][1].map((n, r) => Math.max(n - cardsOf(s, r), 0))) / 5, src: (s, j) => of(s, range(222, 10), k => range(232 + 7 * k, 5)), how: (s, j) => `cards missing for a ${COSTS[j][0]}, from the cards columns, ÷ 5` }
+];
+
+// The summary row, as in decode()'s globals.
+const copy = (name, at, cols, div) => ({ name: div > 1 ? `${name} ÷ ${div}` : name, cols, val: (_, j) => O[at + j] / div, src: (_, j) => [at + j], how: (_, j) => `number ${at + j}${div > 1 ? ` ÷ ${div}` : ""}` });
+const hot = (name, at, cols, none) => ({ name, cols, val: (_, j) => +((O[at] === NONE ? none : O[at]) === j), src: () => [at], how: () => `one-hot of number ${at}, which is ${shown(at)}` });
+const mask = (name, at) => ({ name, cols: PNAME, val: (_, j) => (O[at] >> j) & 1, src: () => [at], how: (_, j) => `bit ${j} of number ${at}` });
+const deal = p => [...RES.map(r => `${p}give ${r}`), ...RES.map(r => `${p}get ${r}`)];
+const SUMMARY = [
+  { name: "players present", cols: PNAME, val: (_, j) => +(j < O[221]), src: () => [221], how: (_, j) => `1 if ${j} is less than number 221 (${O[221]})` },
+  copy("your hand", 222, [...RES, ...RES.map(r => `${r} set aside`)], 10),
+  copy("others' hands", 232, [1, 2, 3].flatMap(s => [...RES.map(r => `P${s} ${r}`), `P${s} held`, `P${s} set aside`]), 10),
+  copy("bank", 253, RES, 10),
+  copy("dev cards, deck, scores", 258, [...CARDS, ...CARDS.map(c => `${c}, new`), "P1 cards", "P1 new", "P2 cards", "P2 new", "P3 cards", "P3 new", "deck", ...CARDS.map(c => `${c}, unseen`), ...PNAME.map(p => `${p} knights`), ...PNAME.map(p => `${p} road length`), ...PNAME.map(p => `${p} points`)], 10),
+  hot("longest road", 292, ["nobody", ...PNAME]),
+  hot("largest army", 293, ["nobody", ...PNAME]),
+  hot("whose turn", 294, PNAME),
+  copy("card played", 295, [""], 1),
+  hot("phase", 296, PHASES),
+  copy("rolled", 297, [""], 1),
+  copy("owed", 298, [""], 4),
+  hot("phase player", 299, [...PNAME, "none"], 4),
+  hot("phase resource", 301, [...RES, "none"], 5),
+  copy("offer", 302, deal(""), 4),
+  { name: "answers", cols: [1, 2, 3].flatMap(s => ANSWER.map(a => `P${s} ${a}`)), val: (_, j) => +(Math.min(O[312 + 11 * Math.floor(j / 5)], 4) === j % 5), src: (_, j) => [312 + 11 * Math.floor(j / 5)], how: (_, j) => `one-hot of number ${312 + 11 * Math.floor(j / 5)}` },
+  { name: "counter-offers ÷ 4", cols: [1, 2, 3].flatMap(s => deal(`P${s} `)), val: (_, j) => O[313 + 11 * Math.floor(j / 10) + j % 10] / 4, src: (_, j) => [313 + 11 * Math.floor(j / 10) + j % 10], how: (_, j) => `number ${313 + 11 * Math.floor(j / 10) + j % 10} ÷ 4` },
+  copy("offers made", 345, [""], 10),
+  copy("decisions left", 346, [""], 40),
+  copy("previous offer", 347, deal(""), 4),
+  mask("previous accepted by", 357),
+  mask("previous countered by", 358),
+  copy("traded", 359, [""], 1),
+  copy("bank rates", 360, RES, 4),
+  copy("safe from the robber", 365, PNAME, 1)
+];
+
+// resources(): one row per resource, the same 27 columns for each, as in features.py.
+const PIPS = TOKENS.map(t => t ? 6 - Math.abs(7 - t) : 0);
+const income = (r, s) => sum(HEXES.map(([, , cs], h) => TERRAIN[h] === r && h !== O[220] ? PIPS[h] * sum(cs.map(v => building(v, s) + 2 * building(v, 4 + s))) : 0)) / 10;
+const RESOURCE = [
+  { name: "you hold ÷ 10", cols: [""], val: r => mine(r) / 10, src: r => [222 + r, 227 + r], how: r => `(number ${222 + r} + number ${227 + r}) ÷ 10` },
+  { name: "bank ÷ 19", cols: [""], val: r => O[253 + r] / 19, src: r => [253 + r], how: r => `number ${253 + r} ÷ 19` },
+  { name: "your rate", cols: ["2:1", "3:1", "4:1"], val: (r, j) => +(Math.min(Math.max(O[360 + r], 2), 4) - 2 === j), src: r => [360 + r], how: r => `one-hot of number ${360 + r} (${O[360 + r]}:1)` },
+  { name: "known held ÷ 10", cols: ["P1", "P2", "P3"], val: (r, k) => O[232 + 7 * k + r] / 10, src: (r, k) => [232 + 7 * k + r], how: (r, k) => `number ${232 + 7 * k + r} ÷ 10` },
+  { name: "offer ÷ 4", cols: ["give", "get"], val: (r, j) => O[302 + 5 * j + r] / 4, src: (r, j) => [302 + 5 * j + r], how: (r, j) => `number ${302 + 5 * j + r} ÷ 4` },
+  { name: "previous offer ÷ 4", cols: ["give", "get"], val: (r, j) => O[347 + 5 * j + r] / 4, src: (r, j) => [347 + 5 * j + r], how: (r, j) => `number ${347 + 5 * j + r} ÷ 4` },
+  { name: "counter-offers ÷ 4", cols: ["P1 give", "P2 give", "P3 give", "P1 get", "P2 get", "P3 get"], val: (r, j) => O[313 + 11 * (j % 3) + 5 * Math.floor(j / 3) + r] / 4, src: (r, j) => [313 + 11 * (j % 3) + 5 * Math.floor(j / 3) + r], how: (r, j) => `number ${313 + 11 * (j % 3) + 5 * Math.floor(j / 3) + r} ÷ 4` },
+  { name: "income ÷ 10", cols: PNAME, val: (r, s) => income(r, s), src: (r, s) => range(32 * s, 16), how: (r, s) => `dots on unblocked ${RES[r]} hexes × ${PNAME[s]}'s settlements (1) and cities (2) on them, ÷ 10` },
+  { name: "which resource", cols: RES, val: (r, j) => +(r === j), src: () => [], how: (r, j) => r === j ? "1: this row's own resource" : "0" }
+];
+RESOURCE[2].paint = () => ({ color: OWNERS.p1.color });
+RESOURCE[8].paint = (r, j) => ({ color: RCOL[j], dark: true });
+
+// Colors, exactly as in the state's grid: who each number is about, or its terrain or harbor.
+const OWNERS = {
+  p1: { name: "You (P0)", color: SEAT[0] },
+  p2: { name: "P1", color: SEAT[1] },
+  p3: { name: "P2", color: SEAT[2] },
+  p4: { name: "P3", color: SEAT[3] },
+  deck: { name: "Deck", color: "#7c3aed" },
+  shared: { name: "Shared", color: "#78716c" }
+};
+function ownerOf(i) {
+  if (i < 128) return ["p1", "p2", "p3", "p4"][i >> 5];
+  if (i >= 222 && i <= 231) return "p1";
+  if (i >= 232 && i <= 238) return "p2";
+  if (i >= 239 && i <= 252) return i <= 245 ? "p3" : "p4";
+  if (i >= 258 && i <= 267) return "p1";
+  if (i >= 268 && i <= 269) return "p2";
+  if (i >= 270 && i <= 273) return i <= 271 ? "p3" : "p4";
+  if (i >= 274 && i <= 279) return "deck";
+  if (i >= 280 && i <= 291) return ["p1", "p2", "p3", "p4"][(i - 280) % 4];
+  if (i >= 312 && i <= 344) return ["p2", "p3", "p4"][Math.floor((i - 312) / 11)];
+  if (i >= 360 && i <= 364) return "p1";
+  if (i >= 365 && i <= 368) return ["p1", "p2", "p3", "p4"][i - 365];
+  return "shared";
+}
+const SHARED = OWNERS.shared.color;
+function byteLook(i) {
+  const v = O[i];
+  if (i >= 128 && i < 147) return { color: TFILL[v], filled: true, dark: true };
+  if (i >= 147 && i < 166) return { color: SHARED, filled: true };
+  if (i >= 166 && i < 220 && v) return { color: HCOL(v), filled: true, dark: true };
+  if (i >= 294 && i <= 301 && v === NONE) return { color: SHARED, filled: false };
+  return { color: OWNERS[ownerOf(i)].color, filled: v !== 0 };
+}
+
+// A matrix column takes the color of the numbers it comes from; terrain, harbor and production columns take their resource's.
+HEX[0].paint = (r, j) => ({ color: TFILL[j], dark: true });
+CORNER[1].paint = (r, j) => j ? { color: HCOL(j), dark: true } : { color: SHARED };
+CORNER[3].paint = (r, j) => ({ color: RCOL[j], dark: true });
+PLAYER[0].paint = s => ({ color: SEAT[s] });
+function cellLook(g, r, j) {
+  if (g.paint) return g.paint(r, j);
+  const src = g.src(r, j);
+  if (!src.length) return { color: SEAT[r] || SHARED };
+  return { color: OWNERS[ownerOf(src[0])].color };
+}
+
+const TABLES = [
+  { id: "h", name: "Hexes", rows: 19, groups: HEX, rowName: h => `h${h}`, rowH: 14 },
+  { id: "v", name: "Corners", rows: 54, groups: CORNER, rowName: v => `v${v}`, rowH: 8 },
+  { id: "e", name: "Edges", rows: 72, groups: EDGE, rowName: e => `e${e}`, rowH: 9, split: 2 },
+  { id: "p", name: "Players", rows: 4, groups: PLAYER, rowName: s => PNAME[s], rowH: 16 },
+  { id: "r", name: "Resources", rows: 5, groups: RESOURCE, rowName: r => RES[r].slice(0, 3), rowH: 16 },
+  { id: "s", name: "Summary", rows: 1, groups: SUMMARY, rowName: () => "", rowH: 14, wrap: 17 }
+];
+TABLES.forEach(t => {
+  t.cols = t.groups.flatMap((g, gi) => g.cols.map((label, j) => ({ g, gi, j, label })));
+  t.feeds = range(0, 369).map(() => []);
+  for (let r = 0; r < t.rows; r++) t.cols.forEach((c, k) => [...new Set(c.g.src(r, c.j))].forEach(n => t.feeds[n].push(`${r},${k}`)));
+});
+const fmt = v => v === 0 ? "0" : Number.isInteger(v) ? `${v}` : v.toFixed(2).replace(/0+$/, "").replace(/^0/, "");
+
+// Board drawing
+const S = 56, NS = "http://www.w3.org/2000/svg", $ = id => document.getElementById(id), svg = $("board");
+const pt = ([x, y]) => [x * 0.866 * S, y * 0.5 * S];
+const poly = h => HEXES[h][2].map(v => pt(VERTS[v]).join(",")).join(" ");
+function add(parent, tag, attrs, text) {
+  const node = document.createElementNS(NS, tag);
+  for (const k in attrs) node.setAttribute(k, attrs[k]);
+  if (text !== undefined) node.textContent = text;
+  parent.appendChild(node);
+  return node;
+}
+const segment = (parent, e, attrs) => { const [[x1, y1], [x2, y2]] = EDGES[e].map(v => pt(VERTS[v])); return add(parent, "line", { x1, y1, x2, y2, ...attrs }); };
+const L = {};
+["hex", "text", "harbor", "pieces", "marks", "labels", "hit"].forEach(k => { L[k] = add(svg, "g", k === "hit" ? {} : { "pointer-events": "none" }); });
+const halo = "paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round";
+HEXES.forEach(([x, y], h) => {
+  const [cx, cy] = pt([x, y]);
+  add(L.hex, "polygon", { points: poly(h), fill: TFILL[TERRAIN[h]], stroke: "#fff", "stroke-width": 3 });
+  if (TOKENS[h]) {
+    add(L.text, "circle", { cx, cy, r: 16, fill: "#fff" });
+    add(L.text, "text", { x: cx, y: cy + 6, "text-anchor": "middle", "font-size": 18, "font-weight": 700, fill: TOKENS[h] === 6 || TOKENS[h] === 8 ? "#b91c1c" : "#111" }, TOKENS[h]);
+  }
+  if (G.robber === h) {
+    add(L.text, "rect", { x: cx + 20, y: cy - 10, width: 20, height: 20, rx: 4, fill: "#1f2937" });
+    add(L.text, "text", { x: cx + 30, y: cy + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: "#fff" }, "R");
+  }
+});
+for (let v = 0; v < 54; v++) {
+  const c = HARBOR[v], n = c ? nextTo[v].find(u => u > v && HARBOR[u] === c) : undefined;
+  if (n === undefined) continue;
+  const a = pt(VERTS[v]), b = pt(VERTS[n]), m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], len = Math.hypot(m[0], m[1]);
+  const p = [m[0] + m[0] / len * 34, m[1] + m[1] / len * 34];
+  [a, b].forEach(q => add(L.harbor, "line", { x1: q[0], y1: q[1], x2: p[0], y2: p[1], stroke: "#94a3b8", "stroke-width": 1.5 }));
+  add(L.harbor, "rect", { x: p[0] - 18, y: p[1] - 9, width: 36, height: 18, rx: 9, fill: HCOL(c), stroke: "#64748b" });
+  add(L.harbor, "text", { x: p[0], y: p[1] + 4, "text-anchor": "middle", "font-size": 11, "font-weight": 600, fill: "#111" }, c === 1 ? "3:1" : "2:1");
+}
+for (let s = 0; s < 4; s++) G.road[s].forEach(e => {
+  segment(L.pieces, e, { stroke: "#fff", "stroke-width": 11, "stroke-linecap": "round" });
+  segment(L.pieces, e, { stroke: SEAT[s], "stroke-width": 7, "stroke-linecap": "round" });
+});
+for (let s = 0; s < 4; s++) {
+  G.settle[s].forEach(v => { const [x, y] = pt(VERTS[v]); add(L.pieces, "circle", { cx: x, cy: y, r: 9.5, fill: SEAT[s], stroke: "#fff", "stroke-width": 2.5 }); });
+  G.city[s].forEach(v => { const [x, y] = pt(VERTS[v]); add(L.pieces, "rect", { x: x - 12, y: y - 12, width: 24, height: 24, rx: 4, fill: SEAT[s], stroke: "#fff", "stroke-width": 2.5 }); });
+}
+HEXES.forEach((_, h) => add(L.hit, "polygon", { points: poly(h), fill: "transparent", style: "cursor:pointer", "data-t": "h", "data-i": h }));
+EDGES.forEach((_, e) => segment(L.hit, e, { stroke: "transparent", "stroke-width": 13, style: "cursor:pointer", "data-t": "e", "data-i": e }));
+VERTS.forEach((c, v) => { const [x, y] = pt(c); add(L.hit, "circle", { cx: x, cy: y, r: 12, fill: "transparent", style: "cursor:pointer", "data-t": "v", "data-i": v }); });
+
+function drawMarks(kind, i, from) {
+  L.marks.innerHTML = "";
+  L.labels.innerHTML = "";
+  const mark = (t, k, strong) => {
+    let at;
+    if (t === "h") { at = pt(HEXES[k]); add(L.marks, "polygon", { points: poly(k), fill: "none", stroke: "#111", "stroke-width": strong ? 4 : 3, "stroke-dasharray": strong ? "" : "6 4" }); at = [at[0], at[1] - 22]; }
+    else if (t === "v") { at = pt(VERTS[k]); add(L.marks, "circle", { cx: at[0], cy: at[1], r: 13, fill: "none", stroke: "#111", "stroke-width": strong ? 4 : 3, "stroke-dasharray": strong ? "" : "4 3" }); at = [at[0], at[1] - 17]; }
+    else { segment(L.marks, k, { stroke: "#facc15", "stroke-width": strong ? 13 : 9, "stroke-linecap": "round", opacity: strong ? .9 : .6 }); const [p, q] = EDGES[k].map(v => pt(VERTS[v])); at = [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2 + 4]; }
+    add(L.labels, "text", { x: at[0], y: at[1], "text-anchor": "middle", "font-size": 14, "font-weight": 700, fill: "#111", style: halo }, t + k);
+  };
+  if (from) Object.entries(from).forEach(([t, ks]) => ks.forEach(k => mark(t, k, false)));
+  if (kind && "hve".includes(kind)) [i].flat().forEach(k => mark(kind, k, true));
+}
+
+// Where one of the 369 numbers is on the board. A building or road number covers eight places: the ones it marks as built are solid.
+function placesOf(n) {
+  if (n < 128) {
+    const k = n % 32, kind = k < 16 ? "v" : "e", first = 8 * (k < 8 ? k : k < 16 ? k - 8 : k - 16);
+    const all = range(first, 8).filter(k => k < (kind === "v" ? 54 : 72)), on = all.filter(k => (O[n] >> (k - first)) & 1);
+    return [kind, on, { [kind]: all.filter(k => !on.includes(k)) }];
+  }
+  if (n < 147) return ["h", [n - 128]];
+  if (n < 166) return ["h", [n - 147]];
+  if (n < 220) return ["v", [n - 166]];
+  if (n === 220) return ["h", [O[220]]];
+  if (n === 300 && O[300] !== NONE) return ["v", [O[300]]];
+  return [];
+}
+
+// The state's grid of 369 numbers, with all four seats filled in.
+$("owners").innerHTML = Object.values(OWNERS).map(o => `<span><span class="swatch" style="--c:${o.color}"></span>${o.name}</span>`).join("");
+const BYTES = range(0, 369).map(n => {
+  const d = document.createElement("div"), l = byteLook(n);
+  d.dataset.n = n;
+  d.textContent = O[n];
+  d.style.setProperty("--c", l.color);
+  d.className = `${l.filled ? "n" : "faint"}${l.dark ? " dark" : ""}${O[n] >= 100 ? " wide" : ""}`;
+  $("bytes").appendChild(d);
+  return d;
+});
+
+// The matrices, in the same colors.
+let T = TABLES[1], at = { r: 18, k: 20 }, byte = null;
+function drawTabs() {
+  $("tabs").innerHTML = TABLES.map((t, k) => `<span class="${t === T ? "cur" : ""}" data-tab="${k}">${t.name}<b>${t.rows}×${t.cols.length}</b></span>`).join("");
+}
+// Each column is labeled on its own, written on a slant above it. Zeros are left blank.
+const COL_LABEL = {
+  "dice number": l => l === "none" ? "no dice" : `dice ${l}`,
+  "buildings on its corners": l => `${l.replace(/city$/, "citie")}s around`,
+  "harbor": l => l === "none" ? "no harbor" : `${l} harbor`,
+  "production": l => `${l} income`,
+  "buildings next door": l => `${l} near`,
+  "roads touching it": l => `${l} touching`,
+  "buildings at its ends": l => `${l} at end`,
+  "roads on touching edges": l => `${l} near`
+};
+const colLabel = c => c.label === "" ? c.g.name : (COL_LABEL[c.g.name] || (l => l))(c.label);
+function block(rows) {
+  let html = `<div class="mx" style="grid-template-columns:26px repeat(${T.cols.length}, 1fr)"><span></span>`;
+  html += T.cols.map((c, k) => `<span class="ch${c.j === 0 && c.gi ? " g0" : ""}" data-ch="${k}"><i>${colLabel(c)}</i></span>`).join("");
+  rows.forEach(r => {
+    html += `<span class="rl" data-rl="${r}" style="height:${T.rowH}px">${T.rowName(r)}</span>`;
+    T.cols.forEach((c, k) => html += cell(r, c, k));
+  });
+  return html + "</div>";
+}
+function cell(r, c, k) {
+  const v = c.g.val(r, c.j), l = cellLook(c.g, r, c.j);
+  const text = fmt(v);
+  return `<div class="${v ? "n" : "faint"}${l.dark ? " dark" : ""}${c.j === 0 && c.gi ? " g0" : ""}${text.length > 2 ? " wide" : ""}" style="height:${T.rowH}px;--c:${l.color}" data-r="${r}" data-k="${k}">${text}</div>`;
+}
+// The summary is one long row, so it's shown one group per line, each line labeled.
+// The summary row, one group per line on shared columns; long groups continue on the next line.
+function summary() {
+  return `<div class="sg sm" style="grid-template-columns:max-content repeat(${T.wrap}, 1fr)">${T.groups.map((g, gi) => {
+    const first = T.cols.findIndex(c => c.gi === gi);
+    let html = "";
+    for (let at = 0; at < g.cols.length; at += T.wrap) {
+      const n = Math.min(T.wrap, g.cols.length - at);
+      html += `<span class="sl" data-gi="${gi}" data-text="${at ? "" : g.name}">${at ? "" : g.name}</span>` + range(at, n).map(j => cell(0, T.cols[first + j], first + j)).join("") +
+        (n < T.wrap ? `<span style="grid-column:span ${T.wrap - n}"></span>` : "");
+    }
+    return html;
+  }).join("")}</div>`;
+}
+
+function drawMats() {
+  if (T.wrap) $("mats").innerHTML = summary();
+  else if (T.split) { const half = Math.ceil(T.rows / T.split); $("mats").innerHTML = range(0, T.split).map(p => block(range(p * half, Math.min(half, T.rows - p * half)))).join(""); }
+  else $("mats").innerHTML = block(range(0, T.rows));
+  paint();
+}
+
+// Hovering a matrix number outlines the numbers it came from; hovering one of the 369 outlines every matrix number it feeds.
+function paint() {
+  const fed = new Set(byte === null ? [] : T.feeds[byte]);
+  const c = at && T.cols[at.k], src = byte !== null ? [byte] : c ? [...new Set(c.g.src(at.r, c.j))] : [];
+  document.querySelectorAll("#mats [data-k]").forEach(d => {
+    const key = `${d.dataset.r},${d.dataset.k}`;
+    d.classList.toggle("hl", (!!at && byte === null && +d.dataset.r === at.r && +d.dataset.k === at.k) || fed.has(key));
+  });
+  document.querySelectorAll("#mats .ch").forEach(h => h.classList.toggle("on", !!c && byte === null && +h.dataset.ch === at.k));
+  document.querySelectorAll("#mats [data-rl]").forEach(l => l.classList.toggle("on", !!c && byte === null && +l.dataset.rl === at.r));
+  document.querySelectorAll("#mats .sl").forEach(l => l.classList.toggle("on", !!c && byte === null && +l.dataset.gi === c.gi));
+  BYTES.forEach((d, n) => d.classList.toggle("hl", src.includes(n)));
+  if (byte !== null) { const [kind, on, rest] = placesOf(byte); drawMarks(kind, on || [], rest); }
+  else if (c) drawMarks(T.id, at.r, c.g.marks && c.g.marks(at.r));
+  else drawMarks();
+  drawTabs();
+}
+
+
+$("tabs").addEventListener("click", ev => {
+  const q = ev.target.closest("[data-tab]");
+  if (!q) return;
+  T = TABLES[+q.dataset.tab];
+  at = null;
+  drawMats();
+});
+$("mats").addEventListener("mouseover", ev => {
+  const d = ev.target.closest("[data-k]");
+  if (!d) return;
+  byte = null;
+  at = { r: +d.dataset.r, k: +d.dataset.k };
+  paint();
+});
+$("bytes").addEventListener("mouseover", ev => {
+  const d = ev.target.closest("[data-n]");
+  if (!d) return;
+  byte = +d.dataset.n;
+  paint();
+});
+$("bytes").addEventListener("mouseleave", () => { byte = null; paint(); });
+svg.addEventListener("click", ev => {
+  const q = ev.target.closest("[data-t]");
+  if (!q) return;
+  T = TABLES.find(t => t.id === q.dataset.t);
+  byte = null;
+  at = { r: +q.dataset.i, k: 0 };
+  drawMats();
+});
+
+// The matrix area keeps the tallest matrix's height, so switching never moves the page.
+at = null;
+$("mats").style.minHeight = Math.max(...TABLES.map(t => { T = t; drawMats(); return $("mats").offsetHeight; })) + "px";
+T = TABLES[1];
+at = { r: 18, k: 20 };
+drawMats();
+
+if (window.frameElement) {
+  new ResizeObserver(() => { window.frameElement.style.height = document.body.offsetHeight + "px"; }).observe(document.body);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+---
+import GitHub from "./icon/github.astro";
+import TwitterX from "./icon/twitter-x.astro";
+import Telegram from "./icon/telegram.astro";
+
+const components = { github: GitHub, twitterX: TwitterX, telegram: Telegram };
+
+interface Props {
+    icon: keyof typeof components;
+}
+
+const { icon } = Astro.props;
+const Icon = components[icon];
+---
+
+<Icon class="fill-current" />
