@@ -22,7 +22,7 @@ const links = NAVIGATION.left;
         {
             links.map((link) => (
                 <div class="flex justify-center px-12 py-4">
-                    <HeaderLink class="block sm:hidden" href={`/${link.href}`}>
+                    <HeaderLink class="block sm:hidden" href={link.href}>
                         {link.title}
                     </HeaderLink>
                 </div>
