@@ -3,6 +3,8 @@ export async function loadEngine(bytes) {
   const { instance } = await WebAssembly.instantiate(bytes, {});
   const w = instance.exports, OB = w.observation_bytes();
   const view = () => new Uint8Array(w.memory.buffer, w.buffer(), 4096);
+  // Arrays in the module's memory, reused and grown as needed.
+  const held = {}, scratch = (key, n) => { if (!held[key] || held[key].n < n) held[key] = { ptr: w.alloc_f32(n), n }; return held[key].ptr; };
   return {
     observationBytes: OB,
     newGame(seed, players, rules) {
@@ -31,5 +33,20 @@ export async function loadEngine(bytes) {
       }
     },
     steps: () => w.history_len(),
+    // What each seat gained from history entry `i` (four seats × five resources), as the engine paid it.
+    gains(i) { if (!w.gains(i)) return null; const v = view(); return [0, 1, 2, 3].map(p => Array.from(v.subarray(5 * p, 5 * p + 5))); },
+    // The heavy arithmetic of the network, for net.js's useKernel.
+    kernel: w,
+    // Looking ahead (catan::search): start, then judge the positions it asks about until it has picked a move.
+    searchStart(simulations, worlds, considered, seed) { w.search_start(simulations, worlds, considered, seed >>> 0, Math.floor(seed / 2 ** 32) >>> 0); },
+    searchLeaves: () => w.search_leaves(),
+    searchLeaf(i) { if (!w.search_leaf(i)) throw new Error(`no leaf ${i}`); const v = view(); return { obs: v.slice(0, OB), mask: Array.from(v.subarray(OB, OB + 257), Boolean) }; },
+    searchExpand(logProbs, values) {
+      const lp = scratch("lp", logProbs.length), vs = scratch("v", values.length);
+      new Float32Array(w.memory.buffer, lp, logProbs.length).set(logProbs);
+      new Float32Array(w.memory.buffer, vs, values.length).set(values);
+      w.search_expand(lp, vs);
+    },
+    searchResult: () => w.search_result(),
   };
 }

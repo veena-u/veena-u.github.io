@@ -160,6 +160,31 @@ export function resources(o, P, T, terrain, tokens) {
   return out;
 }
 
+// ---- The heavy arithmetic, run in the engine's WebAssembly module when one is given (several times faster): its
+// weights are copied into the module's memory once, and each call's input and output pass through reused arrays.
+let K = null;
+export function useKernel(kernel) { K = kernel; }
+const kHeld = {};
+const kArray = (key, n) => { if (!kHeld[key] || kHeld[key].n < n) kHeld[key] = { ptr: K.alloc_f32(n), n }; return kHeld[key].ptr; };
+const kView = (ptr, n) => new Float32Array(K.memory.buffer, ptr, n);
+function kUpload(t) {
+  if (t.kernel !== K) { t.ptr = K.alloc_f32(t.data.length); kView(t.ptr, t.data.length).set(t.data); t.kernel = K; }
+  return t.ptr;
+}
+function kLinear(Wt, bt, x, rows, inp) {
+  const n = rows * inp, out = Wt.out, w = kUpload(Wt), b = kUpload(bt), xp = kArray("x", n), yp = kArray("y", rows * out);
+  kView(xp, n).set(x.length === n ? x : x.subarray(0, n));
+  K.linear(xp, w, b, yp, rows, inp, out);
+  return kView(yp, rows * out).slice();
+}
+function kAttention(qkv, rb, block, rel) {
+  const q = kArray("qkv", qkv.length), a = kArray("att", ROWS * WIDTH), bias = kUpload(rb);
+  if (!kHeld.rel || kHeld.rel.src !== rel) { const p = K.alloc_f32(Math.ceil(rel.length / 4)); new Uint8Array(K.memory.buffer, p, rel.length).set(rel); kHeld.rel = { ptr: p, src: rel }; }
+  kView(q, qkv.length).set(qkv);
+  K.attention(q, bias + 4 * block * HEADS * 12, kHeld.rel.ptr, a, ROWS, WIDTH, HEADS);
+  return kView(a, ROWS * WIDTH).slice();
+}
+
 // ---- Weights: half precision on the wire, each linear layer kept as input × output for fast loops.
 const half = h => { const s = h & 0x8000 ? -1 : 1, e = (h >> 10) & 31, f = h & 1023;
   return e === 0 ? s * f * 2 ** -24 : e === 31 ? (f ? NaN : s * Infinity) : s * (1 + f / 1024) * 2 ** (e - 15); };
@@ -180,8 +205,26 @@ export function loadWeights(manifest, buffer, precision = "f16") {
 
 // y = x · W + b for `rows` rows of x (row-major), with W stored input × output.
 function linear(W, name, x, rows, inp = W[name + ".weight"].inp) {
+  if (K) return kLinear(W[name + ".weight"], W[name + ".bias"], x, rows, inp);
   const { data, out } = W[name + ".weight"], b = W[name + ".bias"].data, y = new Float32Array(rows * out);
-  for (let r = 0; r < rows; r++) {
+  // Four rows at a time, so each weight read from memory is used four times; the sums are kept in doubles and stored
+  // once, which is both faster and no less exact than adding into the float32 output.
+  const acc = new Float64Array(4 * out);
+  let r = 0;
+  for (; r + 4 <= rows; r += 4) {
+    for (let j = 0; j < out; j++) { const bj = b[j]; acc[j] = bj; acc[out + j] = bj; acc[2 * out + j] = bj; acc[3 * out + j] = bj; }
+    const x0 = r * inp, x1 = x0 + inp, x2 = x1 + inp, x3 = x2 + inp;
+    for (let i = 0; i < inp; i++) {
+      const a0 = x[x0 + i], a1 = x[x1 + i], a2 = x[x2 + i], a3 = x[x3 + i], wo = i * out;
+      if (a0 === 0 && a1 === 0 && a2 === 0 && a3 === 0) continue;
+      for (let j = 0; j < out; j++) {
+        const w = data[wo + j];
+        acc[j] += a0 * w; acc[out + j] += a1 * w; acc[2 * out + j] += a2 * w; acc[3 * out + j] += a3 * w;
+      }
+    }
+    y.set(acc, r * out);
+  }
+  for (; r < rows; r++) {
     const yo = r * out, xo = r * inp;
     y.set(b, yo);
     for (let i = 0; i < inp; i++) {
@@ -213,7 +256,9 @@ function erf(x) {
     t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
   return s * y;
 }
-const gelu = x => { for (let i = 0; i < x.length; i++) x[i] = 0.5 * x[i] * (1 + erf(x[i] / Math.SQRT2)); return x; };
+const gelu = x => {
+  if (K) { const p = kArray("gelu", x.length); kView(p, x.length).set(x); K.gelu(p, x.length); x.set(kView(p, x.length)); return x; }
+  for (let i = 0; i < x.length; i++) x[i] = 0.5 * x[i] * (1 + erf(x[i] / Math.SQRT2)); return x; };
 
 const flat = rows => { const n = rows.length, d = rows[0].length, out = new Float32Array(n * d); rows.forEach((r, i) => out.set(r, i * d)); return out; };
 
@@ -237,8 +282,8 @@ export function forward(W, T, o, mask) {
   for (let b = 0; b < DEPTH; b++) {
     const p = `blocks.${b}.`;
     const qkv = linear(W, p + "qkv", layerNorm(W, p + "attend_norm", x, ROWS), ROWS);
-    const att = new Float32Array(ROWS * WIDTH), row = new Float64Array(ROWS);
-    for (let h = 0; h < HEADS; h++) {
+    const att = K ? kAttention(qkv, W["relation_bias"], b, T.rel) : new Float32Array(ROWS * WIDTH), row = new Float64Array(ROWS);
+    for (let h = 0; h < (K ? 0 : HEADS); h++) {
       const bias = rb.subarray((b * HEADS + h) * 12, (b * HEADS + h) * 12 + 12);
       for (let i = 0; i < ROWS; i++) {
         let best = -Infinity;

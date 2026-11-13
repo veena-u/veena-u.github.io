@@ -5,119 +5,151 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Play the network</title>
 <style>
-:root { --ink: #1f2937; --muted: #6b7280; --line: #e5e7eb; --soft: #f9fafb; --orange: #b45309; }
+:root { --ink: #1f2937; --muted: #9ca3af; --soft-ink: #6b7280; --line: #eceef1; --soft: #f7f7f8; --orange: #b45309; --slate: #475569; --sea: #6fa8d6;
+  --mono: ui-monospace, Menlo, monospace; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; }
-body { color: var(--ink); background: #fff; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
-button { font: inherit; border: 1px solid var(--line); background: #fff; color: #374151; border-radius: 5px; padding: 4px 10px; cursor: pointer; }
-button:hover:not(:disabled) { border-color: #9ca3af; }
-button:disabled { opacity: .35; cursor: default; }
-button.primary { background: #111; border-color: #111; color: #fff; }
-button.active { border-color: #111; box-shadow: 0 0 0 1px #111; color: #111; }
-#app { display: grid; grid-template-columns: 1fr 250px; grid-template-rows: 34px 1fr auto; height: 100vh; gap: 0 12px; padding: 6px 8px 8px; }
-#top { grid-column: 1 / 3; display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--muted); }
-#top b { color: var(--ink); font-size: 13px; }
+body { color: var(--ink); background: transparent; font: 13px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+button { font: inherit; font-size: 12px; border: 1px solid var(--line); background: #fff; color: var(--ink); border-radius: 999px; padding: 4px 12px; cursor: pointer;
+  transition: border-color .15s, background .15s, opacity .15s; }
+button:hover:not(:disabled) { border-color: #c7cbd1; }
+button:disabled { opacity: .3; cursor: default; }
+button.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
+button.active { border-color: var(--ink); color: var(--ink); background: var(--soft); }
+select, label { font: 11px var(--mono); color: var(--soft-ink); }
+select { border: 0; background: transparent; color: var(--ink); cursor: pointer; }
+input[type=checkbox] { accent-color: var(--ink); vertical-align: -2px; margin: 0 3px 0 0; }
+#app { display: grid; grid-template-columns: 1fr 236px; grid-template-rows: 30px 1fr auto; height: 100vh; gap: 0 18px; padding: 4px 8px 8px; }
+#top { grid-column: 1 / 3; display: flex; align-items: center; gap: 14px; }
+#top b { font-size: 13px; font-weight: 600; white-space: nowrap; }
+#top label { white-space: nowrap; }
+#rules { font: 10.5px var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 #top .grow { flex: 1; }
-#board-wrap { position: relative; min-height: 0; background: #6fa8d6; border-radius: 8px; }
+#newgame { padding: 2px 10px; font-size: 11.5px; white-space: nowrap; }
+#board-wrap { position: relative; min-height: 0; background: var(--sea); border-radius: 10px; }
 #board { width: 100%; height: 100%; display: block; }
-#side { grid-row: 2 / 4; grid-column: 2; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
-.panel { background: #fff; border: 1px solid var(--line); border-radius: 8px; }
-#players { padding: 4px; display: flex; flex-direction: column; gap: 2px; }
-.player { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 8px; padding: 5px 7px; border-radius: 6px; }
-.player.current { background: var(--soft); box-shadow: inset 0 0 0 1px var(--line); }
-.dot { width: 10px; height: 10px; border-radius: 50%; }
-.pname { font-weight: 600; font-size: 12.5px; }
-.pstats { color: var(--muted); font: 10.5px ui-monospace, Menlo, monospace; display: flex; gap: 8px; flex-wrap: wrap; }
-.vp { font: 600 16px ui-monospace, Menlo, monospace; }
-.badge { font: 10px system-ui, sans-serif; padding: 0 5px; border-radius: 4px; background: #f3f4f6; color: var(--ink); }
-#log { flex: 1; overflow-y: auto; padding: 6px 9px; font-size: 12px; min-height: 0; }
-#log .event { padding: 2px 0; border-bottom: 1px solid #f3f4f6; }
+#side { grid-row: 2 / 4; grid-column: 2; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.panel { background: transparent; border: 0; }
+.cap { font: 10.5px var(--mono); color: var(--muted); margin-bottom: 4px; }
+#players { display: flex; flex-direction: column; }
+.player { display: grid; grid-template-columns: 3px 1fr auto; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--line); }
+.player:first-child { border-top: 0; }
+.dot { width: 3px; height: 30px; border-radius: 2px; opacity: .35; }
+.player.current .dot { opacity: 1; }
+.pname { font-weight: 500; font-size: 12.5px; }
+.player.current .pname { font-weight: 600; }
+.pstats { color: var(--muted); font: 10.5px var(--mono); display: flex; gap: 7px; flex-wrap: wrap; }
+.vp { font: 600 17px var(--mono); }
+.badge { font: 10.5px var(--mono); color: var(--orange); }
+#bankrow { display: flex; gap: 4px; align-items: center; }
+#bankrow div { flex: 1; height: 22px; border-radius: 4px; display: grid; place-items: center; font: 600 10.5px var(--mono); color: #111; }
+#logwrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#log { flex: 1; overflow-y: auto; font-size: 12px; min-height: 0; padding-right: 4px; }
+#log .event { padding: 3px 0; color: #374151; }
 #log .who { font-weight: 600; }
-#bottom { grid-column: 1; display: flex; align-items: flex-end; gap: 10px; padding-top: 6px; }
-#hand { padding: 6px 8px; display: flex; gap: 4px; align-items: flex-end; min-height: 66px; flex: none; }
-.card { width: 36px; height: 52px; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-  padding: 4px 0; color: #111; position: relative; border: 1px solid rgba(0, 0, 0, .15); user-select: none; }
-.card .count { font: 600 15px ui-monospace, Menlo, monospace; }
-.card .label { font-size: 9px; text-transform: uppercase; letter-spacing: .3px; }
-.card.clickable { cursor: pointer; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #111; }
-.card.faded { opacity: .35; }
+#log .paid { font: 11px var(--mono); color: var(--soft-ink); padding-left: 12px; }
+#forecast .fr { display: grid; grid-template-columns: 52px 1fr 34px; align-items: center; gap: 6px; font-size: 11.5px; padding: 1px 0; }
+#forecast .bar { height: 6px; border-radius: 3px; }
+#forecast .pc { font: 10.5px var(--mono); color: var(--soft-ink); text-align: right; }
+.hintline { font: 11px var(--mono); color: var(--soft-ink); }
+button.small { padding: 1px 9px; font-size: 11px; }
+#log .event.fresh { animation: fresh .6s ease-out; }
+@keyframes fresh { from { background: #fdf3e7; } to { background: transparent; } }
+#bottom { grid-column: 1; display: flex; align-items: flex-end; gap: 14px; padding-top: 8px; }
+#hand { display: flex; gap: 5px; align-items: flex-end; min-height: 58px; flex: none; }
+.card { width: 34px; height: 48px; border-radius: 5px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 5px 0 3px; color: #111; position: relative; user-select: none; transition: opacity .2s, transform .15s; }
+.card .count { font: 600 15px var(--mono); }
+.card .label { font: 8px var(--mono); text-transform: uppercase; letter-spacing: .02em; opacity: .75; }
+.card.clickable { cursor: pointer; box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--ink); }
+.card.clickable:hover { transform: translateY(-2px); }
+.card.faded { opacity: .25; }
 .brick { background: #cf7b57; } .lumber { background: #6a9a6f; color: #fff; } .wool { background: #b5d99a; }
-.grain { background: #efd47a; } .ore { background: #aab0ba; } .dev { background: #7c3aed; color: #fff; }
-#actions { padding: 6px; display: flex; gap: 5px; align-items: center; margin-left: auto; flex-wrap: wrap; }
-#roll { position: absolute; left: 6px; top: 4px; padding: 4px 10px; font: 600 18px ui-monospace, Menlo, monospace; }
-#roll small { font: 10px system-ui, sans-serif; color: var(--muted); display: block; }
-#bank { position: absolute; left: 6px; top: 56px; padding: 5px 7px; }
-#bank small { font-size: 10px; color: var(--muted); display: block; margin-bottom: 3px; }
-#bank .stock { display: grid; grid-template-columns: repeat(3, 26px); gap: 3px; }
-#bank .stock div { height: 30px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, .15); display: grid; place-items: center; font: 600 11.5px ui-monospace, Menlo, monospace; }
-#banner { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); padding: 5px 12px; font-weight: 600; display: none; align-items: center; gap: 8px; white-space: nowrap; }
-#trade, #offer { position: absolute; left: 50%; transform: translateX(-50%); padding: 10px 12px; display: none; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
-#trade { bottom: 4px; min-width: 360px; }
-#offer { top: 42px; min-width: 300px; }
-h3 { margin: 0 0 6px; font-size: 13px; }
-.row { display: flex; align-items: center; gap: 6px; margin: 5px 0; }
-.row .what { width: 56px; font-size: 12px; color: var(--muted); }
-.chip { width: 38px; height: 38px; border-radius: 5px; display: grid; place-items: center; font-size: 9px; text-transform: uppercase; position: relative;
-  cursor: pointer; border: 1px solid rgba(0, 0, 0, .15); }
-.chip .n { position: absolute; right: 3px; bottom: 1px; font: 600 12px ui-monospace, Menlo, monospace; text-transform: none; }
-.chip.off { opacity: .3; cursor: default; }
-.chip.picked { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #111; }
+.grain { background: #efd47a; } .ore { background: #aab0ba; } .dev { background: #ddd6fe; color: #4c1d95; }
+#actions { display: flex; gap: 5px; align-items: center; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+#roll { position: absolute; left: 12px; top: 10px; display: flex; gap: 4px; align-items: center; }
+#roll .die { width: 26px; height: 26px; border-radius: 6px; background: #fff; display: grid; place-items: center; font: 600 13px var(--mono); }
+#roll small { font: 10.5px var(--mono); color: rgba(255,255,255,.9); margin-left: 4px; }
+#banner { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); padding: 6px 14px; font-size: 12.5px; font-weight: 500; display: none; align-items: center;
+  justify-content: center; gap: 4px 10px; flex-wrap: wrap; text-align: center; width: max-content; max-width: min(560px, 92%); background: #fff; border-radius: 12px; }
+#trade, #offer { position: absolute; left: 50%; transform: translateX(-50%); padding: 12px 14px; display: none; background: #fff; border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 6px 20px rgba(0,0,0,.08); }
+#trade { bottom: 10px; min-width: 360px; }
+#offer { top: 48px; min-width: 300px; }
+h3 { margin: 0 0 8px; font-size: 12.5px; font-weight: 600; }
+.row { display: flex; align-items: center; gap: 6px; margin: 6px 0; }
+.row .what { width: 56px; font: 10.5px var(--mono); color: var(--muted); }
+.chip { width: 38px; height: 38px; border-radius: 6px; display: grid; place-items: center; font: 8px var(--mono); text-transform: uppercase; position: relative; cursor: pointer; }
+.chip .n { position: absolute; right: 4px; bottom: 2px; font: 600 11.5px var(--mono); text-transform: none; }
+.chip.off { opacity: .25; cursor: default; }
+.chip.picked { box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--ink); }
 .builder { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 button.minus { padding: 0 7px; font-size: 12px; line-height: 14px; }
 .minus-space { height: 16px; }
 .offer-head { display: flex; align-items: center; gap: 10px; }
 .offer-side { display: flex; flex-direction: column; gap: 2px; }
-.offer-side small, .counter-offer small { color: var(--muted); font-size: 10.5px; }
+.offer-side small, .counter-offer small { font: 10px var(--mono); color: var(--muted); }
 .swap { color: var(--muted); }
 .tiles { display: flex; gap: 3px; }
-.tile { width: 22px; height: 30px; border-radius: 4px; position: relative; border: 1px solid rgba(0, 0, 0, .15); }
-.tile b { position: absolute; right: -5px; bottom: -6px; background: #111; color: #fff; border-radius: 6px; font: 9.5px ui-monospace, Menlo, monospace; padding: 0 3px; }
-.tile.any { width: auto; padding: 0 6px; background: #f3f4f6; font-size: 10.5px; display: grid; place-items: center; }
-.responses { display: flex; flex-direction: column; gap: 5px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.tile { width: 20px; height: 28px; border-radius: 4px; position: relative; }
+.tile b { position: absolute; right: -5px; bottom: -6px; background: var(--ink); color: #fff; border-radius: 6px; font: 9.5px var(--mono); padding: 0 3px; }
+.tile.any { width: auto; padding: 0 6px; background: var(--soft); font: 10px var(--mono); color: var(--soft-ink); display: grid; place-items: center; }
+.responses { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
 .response { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-.mark { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 12px; color: #fff; flex: none; padding: 0; border: 0; }
-.mark.yes { background: #16a34a; } .mark.no { background: #475569; } .mark.wait { background: #d1d5db; }
-button.mark { cursor: pointer; box-shadow: 0 0 0 3px rgba(22, 163, 74, .25); }
-.counter-offer { display: flex; align-items: center; gap: 8px; margin-left: 30px; padding: 6px 8px; border-radius: 6px; background: var(--soft); border: 1px solid var(--line); }
-.choices { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
-.result { margin-top: 6px; font-size: 12px; color: var(--muted); }
+.mark { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 11px; color: #fff; flex: none; padding: 0; border: 0; }
+.mark.yes { background: var(--orange); } .mark.no { background: var(--slate); } .mark.wait { background: #e5e7eb; color: var(--soft-ink); }
+button.mark { cursor: pointer; box-shadow: 0 0 0 3px rgba(180, 83, 9, .2); }
+.counter-offer { display: flex; align-items: center; gap: 8px; margin-left: 30px; padding: 6px 8px; border-radius: 6px; background: var(--soft); }
+.choices { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+.result { margin-top: 6px; font: 10.5px var(--mono); color: var(--muted); }
 .discarding { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; margin-left: 6px; }
-.x { border: 0; color: var(--muted); padding: 0 4px; }
+.x { border: 0; color: var(--muted); padding: 0 4px; background: transparent; }
 .seat-name { font-weight: 600; }
-svg .target { cursor: pointer; }
-#start, #over { position: absolute; inset: 0; display: none; place-items: center; background: rgba(255, 255, 255, .85); z-index: 5; }
-#start .panel, #over .panel { padding: 18px 22px; text-align: center; max-width: 420px; }
-#start h2, #over h2 { margin: 0 0 6px; font-size: 16px; }
-#start p { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
-#start .modes { display: flex; gap: 10px; justify-content: center; }
-#start .modes button { padding: 10px 14px; text-align: left; }
-#start .modes small { display: block; color: var(--muted); font-size: 11px; }
-#start .modes button.cur { border-color: #111; box-shadow: 0 0 0 1px #111; }
-#start .modes button i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
-.fly { position: fixed; z-index: 20; width: 22px; height: 30px; border-radius: 4px; border: 1px solid rgba(0, 0, 0, .2); pointer-events: none;
-  transition: transform 1.3s cubic-bezier(.45, 0, .25, 1), opacity .25s; box-shadow: 0 2px 6px rgba(0, 0, 0, .2); }
+svg .target { cursor: pointer; transition: opacity .15s; }
+svg .spot { opacity: .85; } svg .spot:hover { opacity: 1; }
+svg .lane { opacity: .45; } svg .lane:hover { opacity: .9; }
+#start, #over { position: absolute; inset: 0; display: none; place-items: center; background: rgba(255, 255, 255, .88); z-index: 5; backdrop-filter: blur(2px); }
+#start .panel, #over .panel { padding: 18px 22px; text-align: center; max-width: 560px; }
+#start h2, #over h2 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+#start p { margin: 0 0 14px; font: 11px var(--mono); color: var(--muted); }
+#start .modes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+#start .modes button { padding: 9px 14px; text-align: left; border-radius: 8px; }
+#start .modes small { display: block; font: 10.5px var(--mono); color: var(--muted); }
+#start .modes button.cur { border-color: var(--ink); }
+#start .modes button i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.fly { position: fixed; z-index: 20; width: 20px; height: 28px; border-radius: 4px; pointer-events: none;
+  transition: transform 1.1s cubic-bezier(.45, 0, .25, 1), opacity .25s; box-shadow: 0 2px 6px rgba(0, 0, 0, .18); }
 .got { animation: got .45s ease-out; }
-@keyframes got { 0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); } }
+@keyframes got { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@media (max-width: 720px) {
+  #app { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto auto; height: auto; min-height: 100vh; gap: 8px 0; }
+  html, body { overflow: auto; height: auto; }
+  #top { grid-column: 1; flex-wrap: wrap; gap: 6px 12px; } #rules { display: none; }
+  #board-wrap { aspect-ratio: 1 / 0.92; }
+  #side { grid-row: 4; grid-column: 1; } #bottom { grid-column: 1; flex-wrap: wrap; } #actions { margin-left: 0; justify-content: flex-start; } #log { max-height: 180px; }
+}
 </style>
 </head>
 <body>
 <div id="app">
   <div id="top">
     <b>Play the network</b><span id="rules"></span><span class="grow"></span>
-    <label>bots move every <select id="pace"><option value="250">0.25 s</option><option value="600" selected>0.6 s</option><option value="1200">1.2 s</option></select></label>
+    <label>pace <select id="pace"><option value="250">0.25 s</option><option value="600" selected>0.6 s</option><option value="1200">1.2 s</option></select></label>
+    <label title="The network's forecast of who wins, and on your turn the move it would make"><input type="checkbox" id="hints" checked>network's view</label>
     <button id="newgame">New game</button>
   </div>
   <div id="board-wrap">
     <svg id="board"></svg>
-    <div id="roll" class="panel"><small>last roll</small><span id="rollsum">–</span></div>
-    <div id="bank" class="panel"><small>bank</small><div class="stock" id="stock"></div></div>
+    <div id="roll"></div>
     <div id="banner" class="panel"></div>
     <div id="offer" class="panel"></div>
     <div id="trade" class="panel"></div>
   </div>
   <div id="side">
-    <div id="players" class="panel"></div>
-    <div id="log" class="panel"></div>
+    <div><div id="players"></div></div>
+    <div id="forecastwrap"><div class="cap">network's forecast: chance of winning</div><div id="forecast"></div></div>
+    <div><div class="cap">bank</div><div id="bankrow"></div></div>
+    <div id="logwrap"><div class="cap">log</div><div id="log"></div></div>
   </div>
   <div id="bottom">
     <div id="hand" class="panel"></div>
@@ -125,7 +157,7 @@ svg .target { cursor: pointer; }
   </div>
   <div id="start"><div class="panel">
     <h2>Play against the trained network</h2>
-    <p>Colonist's rules. The network runs in your browser and only sees what you would see.</p>
+    <p>the network runs in your browser and sees only what you would see</p>
     <div class="modes">
       <button data-mode="2p">1 v 1<small>first to 15, no player trades</small></button>
       <button data-mode="4p">4 players<small>you and three networks, first to 10</small></button>
@@ -139,7 +171,7 @@ svg .target { cursor: pointer; }
 // The trained network to play against, entirely in the browser: the Rust engine compiled to WebAssembly (play/catan.wasm),
 // the network in plain JavaScript (play/net.js, checked against PyTorch) and the Python viewer's game logic (play/session.js).
 import { loadEngine } from "./play/engine.js";
-import { loadWeights } from "./play/net.js";
+import { loadWeights, useKernel } from "./play/net.js";
 import { Session, NAMES } from "./play/session.js";
 
 const RES = ["brick", "lumber", "wool", "grain", "ore"];
@@ -174,7 +206,7 @@ let engine = null, tables = null;
 async function load(name) {
   if (!engine) {
     const [wasm, t] = await Promise.all([fetch("./play/catan.wasm").then(r => r.arrayBuffer()), fetch("./play/tables.json").then(r => r.json())]);
-    engine = await loadEngine(wasm); tables = t;
+    engine = await loadEngine(wasm); tables = t; useKernel(engine.kernel);
   }
   if (!cache[name]) {
     const [manifest, raw] = await Promise.all([fetch(`./play/weights-${name}.json`).then(r => r.json()), fetch(`./play/weights-${name}.bin`).then(r => r.arrayBuffer())]);
@@ -196,6 +228,8 @@ async function chooseMode(name) {
     el("button", { on: { click: () => begin(null) } }, ["Random", el("small", { text: "any seat" })]));
   $("seatpick").style.display = "block";
 }
+$("hints").addEventListener("change", () => render());
+const showHints = () => $("hints").checked;
 function begin(seat) { $("start").style.display = "none"; newGame(seat); }
 document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => chooseMode(b.dataset.mode)));
 const showStart = () => { clearTimeout(timer); $("over").style.display = "none"; $("loading").textContent = ""; $("seatpick").style.display = "none";
@@ -254,14 +288,14 @@ function drawBoard() {
   const vs = g.vertices.map(pt), hs = g.hexes.map(pt);
   const xs = vs.map(p => p[0]), ys = vs.map(p => p[1]), pad = R * 1.2;
   svg.setAttribute("viewBox", `${Math.min(...xs) - pad} ${Math.min(...ys) - pad} ${Math.max(...xs) - Math.min(...xs) + 2 * pad} ${Math.max(...ys) - Math.min(...ys) + 2 * pad}`);
-  g.corners.forEach((corners, h) => svg.append(el("svg:polygon", { points: corners.map(v => vs[v].join(",")).join(" "), fill: TERRAIN[b.terrain[h]], stroke: "#fff", "stroke-width": 4 })));
+  g.corners.forEach((corners, h) => svg.append(el("svg:polygon", { points: corners.map(v => vs[v].join(",")).join(" "), fill: TERRAIN[b.terrain[h]], stroke: "#fff", "stroke-width": 3 })));
   for (const e of g.coast) {
     const [a, c] = g.edges[e], ha = b.harbors[a];
     if (!ha || ha !== b.harbors[c]) continue;
     const mx = (vs[a][0] + vs[c][0]) / 2, my = (vs[a][1] + vs[c][1]) / 2, len = Math.hypot(mx, my), ox = mx + mx / len * R * .62, oy = my + my / len * R * .62;
-    for (const v of [a, c]) svg.append(el("svg:line", { x1: vs[v][0], y1: vs[v][1], x2: ox, y2: oy, stroke: "#94a3b8", "stroke-width": 2 }));
-    svg.append(el("svg:rect", { x: ox - 21, y: oy - 11, width: 42, height: 22, rx: 11, fill: ha === "3:1" ? "#fff" : TERRAIN[{ brick: "hills", lumber: "forest", wool: "pasture", grain: "fields", ore: "mountains" }[ha]], stroke: "#64748b" }));
-    svg.append(el("svg:text", { x: ox, y: oy + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 600, fill: "#111", text: ha === "3:1" ? "3:1" : "2:1" }));
+    for (const v of [a, c]) svg.append(el("svg:line", { x1: vs[v][0], y1: vs[v][1], x2: ox, y2: oy, stroke: "#fff", "stroke-width": 1.5, opacity: 0.7 }));
+    svg.append(el("svg:rect", { x: ox - 18, y: oy - 10, width: 36, height: 20, rx: 10, fill: ha === "3:1" ? "#fff" : TERRAIN[{ brick: "hills", lumber: "forest", wool: "pasture", grain: "fields", ore: "mountains" }[ha]], stroke: "#fff", "stroke-width": 1.5 }));
+    svg.append(el("svg:text", { x: ox, y: oy + 4, "text-anchor": "middle", "font-size": 11, "font-weight": 600, "font-family": "ui-monospace, Menlo, monospace", fill: "#111", text: ha === "3:1" ? "3:1" : "2:1" }));
   }
   b.tokens.forEach((n, h) => {
     const [x, y] = hs[h];
@@ -272,29 +306,32 @@ function drawBoard() {
       for (let i = 0; i < pips; i++) svg.append(el("svg:circle", { cx: x + (i - (pips - 1) / 2) * 4.6, cy: y + 10, r: 1.7, fill: hot ? "#b91c1c" : "#111" }));
     }
     if (h === b.robber) {
-      svg.append(el("svg:rect", { x: x + 18, y: y - 11, width: 22, height: 22, rx: 4, fill: "#1f2937" }));
-      svg.append(el("svg:text", { x: x + 29, y: y + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 700, fill: "#fff", text: "R" }));
+      svg.append(el("svg:circle", { cx: n ? x + 26 : x, cy: n ? y - 16 : y, r: 9, fill: "#1f2937", stroke: "#fff", "stroke-width": 2 }));
     }
   });
   if (Date.now() < darkened.until) darkened.hexes.forEach(h => svg.append(el("svg:polygon", { points: g.corners[h].map(v => vs[v].join(",")).join(" "), fill: "#111", opacity: 0.35, "pointer-events": "none" })));
   const pick = kind => yours() ? movesOf(kind) : [];
   const showing = kind => mode === kind || ["place settlement", "place road", "move robber", "road building"].includes(view.phase);
   if (showing("robber")) for (const m of pick("robber")) svg.append(el("svg:polygon", { points: g.corners[m.hex].map(v => vs[v].join(",")).join(" "),
-    fill: "rgba(17,17,17,0.08)", stroke: "#111", "stroke-width": 3, class: "target", on: { click: () => act(m.code) } }));
+    fill: "rgba(17,17,17,0.10)", stroke: "#fff", "stroke-width": 3, class: "target", on: { click: () => act(m.code) } }));
   for (const r of b.roads) {
     const [a, c] = g.edges[r.edge];
-    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: "#fff", "stroke-width": 12, "stroke-linecap": "round" }));
+    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: "#fff", "stroke-width": 11, "stroke-linecap": "round" }));
     svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: COLORS[r.seat], "stroke-width": 8, "stroke-linecap": "round" }));
   }
   if (showing("road")) for (const m of pick("road")) {
     const [a, c] = g.edges[m.edge];
-    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: COLORS[view.human], "stroke-width": 8, "stroke-linecap": "round", opacity: 0.35, class: "target", on: { click: () => act(m.code) } }));
+    svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: "#fff", "stroke-width": 9, "stroke-linecap": "round", class: "target lane", on: { click: () => act(m.code) } }));
   }
-  for (const s of b.settlements) { const [x, y] = vs[s.vertex]; svg.append(el("svg:circle", { cx: x, cy: y, r: 10, fill: COLORS[s.seat], stroke: "#fff", "stroke-width": 3 })); }
+  for (const s of b.settlements) { const [x, y] = vs[s.vertex]; svg.append(el("svg:circle", { cx: x, cy: y, r: 10, fill: COLORS[s.seat], stroke: "#fff", "stroke-width": 2.5 })); }
   for (const c of b.cities) { const [x, y] = vs[c.vertex]; svg.append(el("svg:rect", { x: x - 13, y: y - 13, width: 26, height: 26, rx: 4, fill: COLORS[c.seat], stroke: "#fff", "stroke-width": 3 })); }
+  const hint = showHints() && yours() && view.insight && view.insight.hint;
+  if (hint && hint.vertex != null) { const [x, y] = vs[hint.vertex]; svg.append(el("svg:circle", { cx: x, cy: y, r: 15, fill: "none", stroke: "#111", "stroke-width": 2, "stroke-dasharray": "4 3", "pointer-events": "none" })); }
+  if (hint && hint.edge != null) { const [a, c] = g.edges[hint.edge]; svg.append(el("svg:line", { x1: vs[a][0], y1: vs[a][1], x2: vs[c][0], y2: vs[c][1], stroke: "#111", "stroke-width": 2, "stroke-dasharray": "4 3", "pointer-events": "none" })); }
+  if (hint && hint.hex != null) svg.append(el("svg:polygon", { points: g.corners[hint.hex].map(v => vs[v].join(",")).join(" "), fill: "none", stroke: "#111", "stroke-width": 2, "stroke-dasharray": "5 4", "pointer-events": "none" }));
   for (const kind of ["settlement", "city"]) if (showing(kind)) for (const m of pick(kind)) {
     const [x, y] = vs[m.vertex];
-    svg.append(el("svg:circle", { cx: x, cy: y, r: kind === "city" ? 17 : 11, fill: "rgba(255,255,255,0.75)", stroke: COLORS[view.human], "stroke-width": 3, class: "target", on: { click: () => act(m.code) } }));
+    svg.append(el("svg:circle", { cx: x, cy: y, r: kind === "city" ? 16 : 5.5, fill: kind === "city" ? "none" : "#fff", stroke: "#fff", "stroke-width": kind === "city" ? 3 : 0, class: "target spot", on: { click: () => act(m.code) } }));
   }
 }
 
@@ -304,7 +341,8 @@ function drawPlayers() {
     el("div", {}, [
       el("div", { class: "pname", text: s.you ? `You (${s.name})` : s.name }),
       el("div", { class: "pstats" }, [
-        el("span", { text: `${s.cards} cards` }), el("span", { text: `${s.devCards} dev` }), el("span", { text: `${s.knights} kn` }), el("span", { text: `road ${s.roadLength}` }),
+        el("span", { text: `${s.cards} cards` }), el("span", { text: `${s.devCards} dev` }), el("span", { text: `road ${s.roadLength}` }),
+        s.knights ? el("span", { text: `${s.knights} knights` }) : null,
         s.longestRoad ? el("span", { class: "badge", text: "longest road" }) : null, s.largestArmy ? el("span", { class: "badge", text: "largest army" }) : null,
       ]),
     ]),
@@ -312,10 +350,25 @@ function drawPlayers() {
   ])));
 }
 
+function drawForecast() {
+  const f = view.insight && view.insight.forecast, on = showHints() && f;
+  $("forecastwrap").style.display = on ? "block" : "none";
+  if (!on) return;
+  const top = Math.max(...f);
+  $("forecast").replaceChildren(...f.map((p, s) => el("div", { class: "fr" }, [
+    el("span", { style: `color:${COLORS[s]};font-weight:600`, text: who(s) }),
+    el("div", { style: "background:var(--soft);border-radius:3px" }, [el("div", { class: "bar", style: `width:${(100 * p / Math.max(top, 1e-9)).toFixed(1)}%;background:${COLORS[s]};opacity:${p === top ? 1 : .45}` })]),
+    el("span", { class: "pc", text: `${Math.round(100 * p)}%` })])));
+}
 function drawLog() {
   const box = $("log"), atBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 4;
-  box.replaceChildren(...view.events.map(e => e.seat == null ? el("div", { class: "event", style: "color:var(--muted)", text: e.text })
-    : el("div", { class: "event" }, [el("span", { class: "who", style: `color:${COLORS[e.seat]}`, text: who(e.seat) + " " }), e.text])));
+  const seen = box.childElementCount;
+  box.replaceChildren(...view.events.map((e, i) => { const cls = "event" + (i >= seen && seen ? " fresh" : "");
+    const line = e.seat == null ? el("div", { style: "color:var(--muted)", text: e.text })
+      : el("div", {}, [el("span", { class: "who", style: `color:${COLORS[e.seat]}`, text: who(e.seat) + " " }), e.text]);
+    const paid = (e.details || []).map(d => d.seat == null ? el("div", { class: "paid", text: d.text })
+      : el("div", { class: "paid" }, [el("span", { style: `color:${COLORS[d.seat]};font-weight:600`, text: who(d.seat) + " " }), d.text.replace(/^received /, "+")]));
+    return el("div", { class: cls }, [line, ...paid]); }));
   if (atBottom) box.scrollTop = box.scrollHeight;
 }
 
@@ -477,29 +530,47 @@ function drawOffer() {
   box.style.display = "block";
 }
 
+// What to do now, in plain words, and (with the network's view on) the move the network would make in your place.
+function describeMove(m) {
+  const where = { settlement: "a settlement here", city: "a city here", road: "a road here", robber: "the robber here" }[m.kind];
+  if (where) return (m.kind === "robber" ? "move " : "build ") + where;
+  if (m.kind === "bank trade") return `trade ${m.give} for ${m.get} with the bank`;
+  if (m.kind === "pick resource") return `take ${m.resource}`;
+  if (m.kind === "rob") return `rob ${who(m.seat)}`;
+  return m.kind;
+}
 function drawBanner() {
   const box = $("banner");
-  box.replaceChildren();
   let text = null, extra = [];
   if (view.winner == null && view.toAct != null && view.toAct !== view.human) text = `${who(view.toAct)} is thinking…`;
   if (yours()) {
-    const phase = view.phase;
-    text = { "place settlement": "Place a settlement", "place road": "Place a road", "move robber": "Move the robber", "road building": "Place a free road",
+    const phase = view.phase, mine = view.board.settlements.filter(x => x.seat === view.human).length;
+    text = {
+      "place settlement": mine === 0 ? "Place your first settlement: click a white dot. Numbers with more dots under them come up more often."
+        : "Place your second settlement: each hex it touches pays you one card right away.",
+      "place road": "Place a road next to the settlement you just placed: click a white line.",
+      "move robber": "Move the robber: click a hex. It stops paying until the robber leaves.", "road building": "Place a free road",
       discard: `Choose ${view.count} cards to discard`, "year of plenty": "Take a resource from the bank", monopoly: "Name a resource to monopolize",
-      "choose victim": "Choose whom to rob" }[phase] || (mode && !["offer", "counter", "bank"].includes(mode) ? `Choose where to build a ${mode}` : null);
-    if (phase === "year of plenty" || phase === "monopoly") extra = movesOf("pick resource").map(m => el("button", { text: m.resource, on: { click: () => act(m.code) } }));
-    if (phase === "choose victim") extra = movesOf("rob").map(m => el("button", { style: `color:${COLORS[m.seat]}`, text: who(m.seat), on: { click: () => act(m.code) } }));
+      "choose victim": "Choose whom to rob",
+    }[phase] || (mode && !["offer", "counter", "bank"].includes(mode) ? `Choose where to build a ${mode}` : null);
+    if (phase === "year of plenty" || phase === "monopoly") extra = movesOf("pick resource").map(m => el("button", { class: "small", text: m.resource, on: { click: () => act(m.code) } }));
+    if (phase === "choose victim") extra = movesOf("rob").map(m => el("button", { class: "small", style: `color:${COLORS[m.seat]}`, text: who(m.seat), on: { click: () => act(m.code) } }));
+    const hint = showHints() && view.insight && view.insight.hint;
+    if (hint) extra.push(el("span", { class: "hintline", text: `the network would ${describeMove(hint)} (${Math.round(100 * hint.chance)}%)` }),
+      el("button", { class: "small", text: "Do that", on: { click: () => act(hint.code) } }));
   }
   box.replaceChildren(...(text ? [el("span", { text })] : []), ...extra);
-  box.style.display = text ? "flex" : "none";
+  box.style.display = text || extra.length ? "flex" : "none";
 }
 
 function render() {
   if (!view) return;
   const r = view.rules;
-  $("rules").textContent = `${view.players === 2 ? "1 v 1" : "4 players"} · first to ${r.points} · discard over ${r.discardLimit}` + (r.friendlyRobber ? " · friendly robber" : "") + (r.balancedDice ? " · balanced dice" : "") + (r.trading ? "" : " · no player trades");
-  $("rollsum").textContent = view.lastRoll ?? "–";
-  $("stock").replaceChildren(...view.bank.map((n, r) => el("div", { class: RES[r], title: `${n} ${RES[r]} left in the bank`, text: n })),
+  $("rules").textContent = `${view.players === 2 ? "1 v 1" : "4 players"}, first to ${r.points}` + (r.trading ? "" : ", no player trades");
+  $("rules").title = [`discard over ${r.discardLimit}`, r.friendlyRobber ? "friendly robber" : null, r.balancedDice ? "balanced dice" : null].filter(Boolean).join(", ");
+  drawForecast();
+  $("roll").replaceChildren(...(view.lastRoll == null ? [] : [el("div", { class: "die", text: view.lastRoll }), el("small", { text: "last roll" })]));
+  $("bankrow").replaceChildren(...view.bank.map((n, r) => el("div", { class: RES[r], title: `${n} ${RES[r]} left in the bank`, text: n })),
     el("div", { class: "dev", title: `${view.deck} development cards left`, text: view.deck }));
   drawBoard(); drawPlayers(); drawLog(); drawHand(); drawActions(); drawTrade(); drawOffer(); drawBanner();
   if (view.winner != null) { $("winner").textContent = view.winner === view.human ? "You won!" : `${who(view.winner)} won`; $("over").style.display = "grid"; }

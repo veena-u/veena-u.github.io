@@ -1,6 +1,6 @@
 // One game against the network, in the browser: a port of the Python viewer's Session (catan/viewer/__main__.py).
 // It plays the network's seats, keeps the running story and the trade board, and builds the view the page draws.
-import { act as think, boardTables, KIND_RUNS, KIND_OF, BANK_PAIRS, OFFER, COUNTER } from "./net.js";
+import { act as think, forward, boardTables, KIND_RUNS, KIND_OF, BANK_PAIRS, OFFER, COUNTER } from "./net.js";
 
 const RESOURCES = ["brick", "lumber", "wool", "grain", "ore"];
 const TERRAINS = ["hills", "forest", "pasture", "fields", "mountains", "desert"];
@@ -54,7 +54,29 @@ export class Session {
     if (actor === null || actor === this.human) return;
     const { obs, mask } = this.engine.observe();
     const move = think(this.weights, this.board, obs, mask, this.engine.forbidden(), { temperature: this.config.temperature });
+    // With search on, as train/search.Searcher plays: the network still makes its own offers and counter-offers,
+    // and every other move it can look ahead on is the one the search picks.
+    if (this.config.search && move.action !== OFFER && move.action !== COUNTER && mask.filter(Boolean).length > 1) {
+      const picked = this.lookAhead(this.config.search);
+      if (picked >= 0) return this.take(picked, null);
+    }
     this.take(move.action, move.deal || null);
+  }
+
+  // A short search from the current position: the engine imagines the hidden cards and plays out a few lines, and
+  // the network judges every position it reaches.
+  lookAhead({ simulations, worlds, considered }) {
+    const e = this.engine;
+    e.searchStart(simulations, worlds, considered, Math.floor(Math.random() * 2 ** 52));
+    for (let n; (n = e.searchLeaves()) > 0;) {
+      const logProbs = new Float32Array(n * 257), values = new Float32Array(n * 4);
+      for (let i = 0; i < n; i++) {
+        const { obs, mask } = e.searchLeaf(i), out = forward(this.weights, this.board, obs, mask);
+        logProbs.set(out.logProbs, i * 257); values.set(out.values, i * 4);
+      }
+      e.searchExpand(logProbs, values);
+    }
+    return e.searchResult();
   }
 
   take(code, deal) {
@@ -62,8 +84,6 @@ export class Session {
     this.countering = null;
     this.track(actor, phase, code, deal, e.draft());
     e.step(code, deal);
-    // The bank just before chance plays out: production on a roll is worked out from it (see collect).
-    this.bankBefore = Array.from(e.observeAs(this.human).slice(253, 258));
     if (this.countering && this.trade) {
       const seat = this.countering[0], proposer = this.trade.proposer;
       const relative = (seat - proposer + this.config.players) % this.config.players;
@@ -121,22 +141,23 @@ export class Session {
 
   narrate() {
     const history = this.engine.history(this.read);
-    for (const [actor, phase, code, current] of history) {
+    history.forEach(([actor, phase, code, current], k) => {
       // Chance (a roll, a steal, a card drawn) belongs to the player whose turn it is.
       if (actor < 0) this.mover = current;
-      const text = this.describe(actor, phase, code);
-      if (text) this.events.push({ seat: actor >= 0 ? actor : this.mover, text });
-      if (this.pending) { this.events.push(...this.pending); this.pending = null; }
+      const text = this.describe(actor, phase, code, this.read + k);
+      const event = text ? { seat: actor >= 0 ? actor : this.mover, text } : null;
+      if (event) this.events.push(event);
+      if (this.pending) { if (event) event.details = this.pending; else this.events.push(...this.pending); this.pending = null; }
       if (actor >= 0) this.mover = actor;
-    }
+    });
     this.read += history.length;
   }
 
-  describe(actor, phase, code) {
+  describe(actor, phase, code, index) {
     const n = this.config.players;
     if (actor < 0) {
       const mover = this.mover;
-      if (PHASES[phase] === "dice") { this.lastRoll = code + 2; this.collect(code + 2); return `rolled ${code + 2}`; }
+      if (PHASES[phase] === "dice") { this.lastRoll = code + 2; this.collect(code + 2, index); return `rolled ${code + 2}`; }
       if (PHASES[phase] === "steal") {
         let victim = this.victim;
         if (victim === null && n === 2) victim = 1 - mover;
@@ -152,9 +173,9 @@ export class Session {
       this.placed[actor] += 1;
       if (this.placed[actor] === 2) {
         const o = this.engine.observeAs(this.human), hexes = this.tables.hexCorners.map((cs, h) => cs.includes(i) && o[128 + h] <= 4 ? h : -1).filter(h => h >= 0);
-        const got = [0, 0, 0, 0, 0]; hexes.forEach(h => got[o[128 + h]] += 1);
-        if (hexes.length) {
-          this.pending = [{ seat: actor, text: `received starting resources ${listed(got)}` }];
+        const got = (this.engine.gains(index) || [])[actor] || [0, 0, 0, 0, 0];
+        if (got.some(Boolean)) {
+          this.pending = [{ seat: actor, text: `received ${listed(got)}` }];
           this.payouts.push({ id: this.payouts.length + 1, hexes: [], cards: hexes.map(h => ({ seat: actor, hex: h, resource: o[128 + h], count: 1 })) });
         }
       }
@@ -171,34 +192,49 @@ export class Session {
     return null;
   }
 
-  // Who collects what on a roll, by the engine's rule: one card per settlement and two per city on each hex showing the
-  // number (not the robber's); if the bank can't pay everyone owed a resource, nobody gets it, unless only one player is
-  // owed, who gets what is left. Production is public, so every player's take is told.
-  collect(sum) {
-    if (sum === 7 || !this.bankBefore) { this.pending = []; return; }
+  // Who collected what on a roll: the cards the engine actually paid each seat (production is public, so every
+  // player's take is told). The board only says which hexes they came from, for the animation.
+  collect(sum, index) {
+    if (sum === 7) { this.pending = []; return; }
     const o = this.engine.observeAs(this.human), n = this.config.players, corners = this.tables.hexCorners;
-    const owed = Array.from({ length: n }, () => [0, 0, 0, 0, 0]), from = [], rolled = [];
-    for (let h = 0; h < 19; h++) {
-      if (o[147 + h] !== sum || h === o[220] || o[128 + h] > 4) continue;
-      rolled.push(h);
-      for (let s = 0; s < n; s++) {
-        const base = 32 * s, seat = this.absolute(s);
-        corners[h].forEach(v => {
-          const bit = at => (o[at + (v >> 3)] >> (v & 7)) & 1, k = bit(base) + 2 * bit(base + 8);
-          if (k) { owed[seat][o[128 + h]] += k; from.push({ seat, hex: h, resource: o[128 + h], count: k }); }
-        });
-      }
+    const got = (this.engine.gains(index) || []).slice(0, n).map(g => g.slice());
+    const rolled = [], cards = [];
+    for (let h = 0; h < 19; h++) if (o[147 + h] === sum && h !== o[220] && o[128 + h] <= 4) rolled.push(h);
+    const left = got.map(g => g.slice());
+    // Each seat's cards of a resource, from the rolled hexes of that resource next to its buildings first.
+    for (const h of rolled) for (let s = 0; s < n; s++) {
+      const seat = this.absolute(s), r = o[128 + h];
+      let k = 0;
+      corners[h].forEach(v => { const bit = at => (o[at + (v >> 3)] >> (v & 7)) & 1; k += bit(32 * s) + 2 * bit(32 * s + 8); });
+      const count = Math.min(k, left[seat][r]);
+      if (count > 0) { cards.push({ seat, hex: h, resource: r, count }); left[seat][r] -= count; }
     }
-    const got = Array.from({ length: n }, () => [0, 0, 0, 0, 0]);
-    for (let r = 0; r < 5; r++) {
-      const total = owed.reduce((a, x) => a + x[r], 0), to = owed.map((x, s) => x[r] > 0 ? s : -1).filter(s => s >= 0);
-      if (total <= this.bankBefore[r]) to.forEach(s => got[s][r] = owed[s][r]);
-      else if (to.length === 1) got[to[0]][r] = this.bankBefore[r];
-      this.bankBefore[r] -= got.reduce((a, x) => a + x[r], 0);
-    }
+    left.forEach((g, seat) => g.forEach((c, r) => { const h = rolled.find(x => o[128 + x] === r); if (c > 0 && h != null) cards.push({ seat, hex: h, resource: r, count: c }); }));
     this.pending = got.map((g, s) => g.some(Boolean) ? { seat: s, text: `received ${listed(g)}` } : null).filter(Boolean);
-    if (!this.pending.length) this.pending = [{ seat: null, text: "No one received anything" }];
-    this.payouts.push({ id: this.payouts.length + 1, hexes: rolled, cards: from.filter(f => got[f.seat][f.resource] > 0) });
+    if (!this.pending.length) this.pending = [{ seat: null, text: "no one received anything" }];
+    this.payouts.push({ id: this.payouts.length + 1, hexes: rolled, cards });
+  }
+
+  // What the network makes of the position, seen from your seat: its forecast of each player's chance of winning, and
+  // on your turn the move it would make (with its chance), so you can compare.
+  insight() {
+    const e = this.engine, key = `${e.steps()}:${e.toAct()}`;
+    if (this.insightKey === key) return this.insightValue;
+    const n = this.config.players, mine = e.toAct() === this.human;
+    const o = mine ? e.observe().obs : e.observeAs(this.human), mask = mine ? e.observe().mask : null;
+    const out = forward(this.weights, this.board, o, mask);
+    // The forecast is the expected reward: +1 for a win, −1/(n−1) otherwise; turned back into a chance of winning.
+    const loss = 1 / (n - 1), chance = out.values.slice(0, n).map(v => Math.min(1, Math.max(0, (v + loss) / (1 + loss))));
+    const total = chance.reduce((a, b) => a + b, 0) || 1, forecast = Array(n).fill(0);
+    chance.forEach((c, s) => { forecast[this.absolute(s)] = c / total; });
+    let hint = null;
+    if (mine && out.logProbs) {
+      let best = -1; for (let a = 0; a < out.logProbs.length; a++) if (mask[a] && (best < 0 || out.logProbs[a] > out.logProbs[best])) best = a;
+      const move = this.moves().find(m => m.code === best);
+      if (move) hint = { ...move, chance: Math.exp(out.logProbs[best]) };
+    }
+    this.insightKey = key; this.insightValue = { forecast, hint };
+    return this.insightValue;
   }
 
   moves() {
@@ -258,7 +294,7 @@ export class Session {
         draft: { give, get }, drafting: ["", "offer", "counter"][drafting], offers: o[OFFERS_MADE], budgetLeft: o[BUDGET_LEFT], closed,
         last: last.some(Boolean) ? { give: last.slice(0, 5), get: last.slice(5), traded: !!o[LAST_TRADED] } : null,
       },
-      lastRoll: this.lastRoll, moves: this.moves(), events: this.events.slice(-60), payouts: this.payouts.slice(-4),
+      lastRoll: this.lastRoll, moves: this.moves(), events: this.events.slice(-60), payouts: this.payouts.slice(-4), insight: e.winner() == null ? this.insight() : null,
       forbidden: e.toAct() === this.human ? e.forbidden() : [], offerBoard: trade,
     };
   }
