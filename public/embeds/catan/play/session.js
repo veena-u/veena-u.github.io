@@ -35,10 +35,16 @@ export class Session {
     this.human = seat ?? Math.floor(Math.random() * n);
     this.engine.newGame(this.seed, n, this.config.rules);
     this.engine.settle();
-    this.events = []; this.read = 0; this.lastRoll = null; this.victim = null; this.mover = 0; this.trade = null;
-    // Each payout (a roll, or starting resources), for the page to animate: which hexes paid whom.
-    this.payouts = []; this.placed = Array(this.config.players).fill(0);
+    this.events = []; this.read = 0; this.victim = null; this.mover = 0; this.trade = null;
+    this.placed = Array(this.config.players).fill(0);
+    // What happened, as typed effects for the page to animate in order (the events above are the same story in words).
+    this.fx = [];
   }
+
+  drain() { const fx = this.fx; this.fx = []; return fx; }
+
+  // Every seat's points as that seat sees them, hidden victory point cards included: for the end of the game.
+  finalPoints() { return Array.from({ length: this.config.players }, (_, s) => this.engine.observeAs(s)[288]); }
 
   absolute(relative) { return (this.human + relative) % this.config.players; }
 
@@ -128,7 +134,14 @@ export class Session {
     else this.say(seat, `${status} the offer`);
   }
 
-  close(text, partner = null) { this.trade.result = text; this.trade.partner = partner; this.say(this.trade.proposer, text); }
+  close(text, partner = null) {
+    const t = this.trade;
+    t.result = text; t.partner = partner; this.say(t.proposer, text);
+    if (partner == null) return;
+    // A counter-offer is told from the side of whoever made it: they give its `give`.
+    const counter = text.startsWith("took") ? t.answers[partner].counter : null;
+    this.fx.push({ type: "trade", a: t.proposer, b: partner, aGives: counter ? counter.get : t.give, bGives: counter ? counter.give : t.get });
+  }
 
   settled() {
     if (!this.trade || this.trade.result) return;
@@ -157,36 +170,46 @@ export class Session {
     const n = this.config.players;
     if (actor < 0) {
       const mover = this.mover;
-      if (PHASES[phase] === "dice") { this.lastRoll = code + 2; this.collect(code + 2, index); return `rolled ${code + 2}`; }
+      if (PHASES[phase] === "dice") { this.fx.push({ type: "roll", seat: mover, sum: code + 2 }); this.collect(code + 2, index); return `rolled ${code + 2}`; }
       if (PHASES[phase] === "steal") {
         let victim = this.victim;
         if (victim === null && n === 2) victim = 1 - mover;
         this.victim = null;
         if (victim === null) return "stole a card";
+        this.fx.push({ type: "steal", from: victim, to: mover, res: [mover, victim].includes(this.human) ? code : null });
         return [mover, victim].includes(this.human) ? `stole 1 ${RESOURCES[code]} from ${NAMES[victim]}` : `stole a card from ${NAMES[victim]}`;
       }
+      if (PHASES[phase] === "draw") this.fx.push({ type: "buy", seat: mover, card: mover === this.human ? code : null });
       if (PHASES[phase] === "draw") return mover === this.human ? `bought a ${DEV_CARDS[code]}` : "bought a development card";
       return null;
     }
     const [kind, start] = KIND_RUNS[KIND_OF[code]], i = code - start;
     if (PHASES[phase] === "place settlement" && kind === "settlement") {
       this.placed[actor] += 1;
+      this.fx.push({ type: "build", kind: "settlement", at: i, seat: actor, free: true });
       if (this.placed[actor] === 2) {
         const o = this.engine.observeAs(this.human), hexes = this.tables.hexCorners.map((cs, h) => cs.includes(i) && o[128 + h] <= 4 ? h : -1).filter(h => h >= 0);
         const got = (this.engine.gains(index) || [])[actor] || [0, 0, 0, 0, 0];
         if (got.some(Boolean)) {
           this.pending = [{ seat: actor, text: `received ${listed(got)}` }];
-          this.payouts.push({ id: this.payouts.length + 1, hexes: [], cards: hexes.map(h => ({ seat: actor, hex: h, resource: o[128 + h], count: 1 })) });
+          // Starting resources: one card from each hex the second settlement touches.
+          this.fx.push({ type: "payout", hexes: [], cards: hexes.map(h => ({ seat: actor, hex: h, resource: o[128 + h], count: 1 })) });
         }
       }
       return "placed a Settlement";
     }
-    if (PHASES[phase] === "place road" && kind === "road") return "placed a Road";
+    if (PHASES[phase] === "place road" && kind === "road") { this.fx.push({ type: "build", kind, at: i, seat: actor, free: true }); return "placed a Road"; }
+    if (["settlement", "city", "road"].includes(kind)) this.fx.push({ type: "build", kind, at: i, seat: actor, free: PHASES[phase] === "road building" });
     if (["settlement", "city", "road"].includes(kind)) return `built a ${kind === "city" ? "City" : kind === "road" ? "Road" : "Settlement"}`;
-    if (kind === "robber") return "moved the robber";
+    if (kind === "robber") { this.fx.push({ type: "robber", seat: actor, hex: i }); return "moved the robber"; }
     if (kind === "rob") { this.victim = (actor + i + 1) % n; return null; }
+    if (kind === "pick resource") {
+      const type = { discard: "discard", "year of plenty": "take", monopoly: "monopoly" }[PHASES[phase]];
+      if (type) this.fx.push({ type, seat: actor, res: i });
+    }
     if (kind === "pick resource") return { discard: "discarded a card", "year of plenty": `took 1 ${RESOURCES[i]} from the bank`, monopoly: `called a monopoly on ${RESOURCES[i]}` }[PHASES[phase]] || null;
-    if (kind === "bank trade") { const [g, t] = BANK_PAIRS[i]; return `traded ${RESOURCES[g]} for 1 ${RESOURCES[t]} with the bank`; }
+    if (kind === "bank trade") { const [g, t] = BANK_PAIRS[i]; this.fx.push({ type: "bank", seat: actor, give: g, get: t }); return `traded ${RESOURCES[g]} for 1 ${RESOURCES[t]} with the bank`; }
+    if (kind.startsWith("play ")) this.fx.push({ type: "play", seat: actor, card: kind.slice(5) });
     if (kind.startsWith("play ")) return `played ${kind.slice(5).replace(/\b\w/g, c => c.toUpperCase())}`;
     if (kind === "end turn") return "ended their turn";
     return null;
@@ -212,7 +235,7 @@ export class Session {
     left.forEach((g, seat) => g.forEach((c, r) => { const h = rolled.find(x => o[128 + x] === r); if (c > 0 && h != null) cards.push({ seat, hex: h, resource: r, count: c }); }));
     this.pending = got.map((g, s) => g.some(Boolean) ? { seat: s, text: `received ${listed(g)}` } : null).filter(Boolean);
     if (!this.pending.length) this.pending = [{ seat: null, text: "no one received anything" }];
-    this.payouts.push({ id: this.payouts.length + 1, hexes: rolled, cards });
+    this.fx.push({ type: "payout", hexes: rolled, cards });
   }
 
   // What the network makes of the position, seen from your seat: its forecast of each player's chance of winning, and
@@ -294,7 +317,7 @@ export class Session {
         draft: { give, get }, drafting: ["", "offer", "counter"][drafting], offers: o[OFFERS_MADE], budgetLeft: o[BUDGET_LEFT], closed,
         last: last.some(Boolean) ? { give: last.slice(0, 5), get: last.slice(5), traded: !!o[LAST_TRADED] } : null,
       },
-      lastRoll: this.lastRoll, moves: this.moves(), events: this.events.slice(-60), payouts: this.payouts.slice(-4), insight: e.winner() == null ? this.insight() : null,
+      moves: this.moves(), events: this.events.slice(-60), insight: e.winner() == null ? this.insight() : null,
       forbidden: e.toAct() === this.human ? e.forbidden() : [], offerBoard: trade,
     };
   }
