@@ -372,7 +372,8 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
 // then settles on the new state. Your input and the network's next move both wait for that to finish.
 import { loadEngine } from "./play/engine.js";
 import { loadWeights, useKernel } from "./play/net.js";
-import { Session, NAMES } from "./play/session.js";
+// The ?v= number is bumped whenever this file changes, so browsers fetch the new one instead of a cached copy.
+import { Session, NAMES } from "./play/session.js?v=2";
 
 const RES = ["brick", "lumber", "wool", "grain", "ore"];
 const RES_NAME = ["Brick", "Lumber", "Wool", "Grain", "Ore"];

@@ -191,7 +191,7 @@ Searching ahead does help at play time: a player that searches before every move
 
 ## Play the network
 
-<iframe src="/embeds/catan/play.html" title="Play the network" loading="lazy" allow="fullscreen" allowfullscreen style="width: min(1240px, 96vw); margin-left: calc(50% - min(620px, 48vw)); height: min(820px, 90vh); border: 0; display: block;"></iframe>
+<iframe src="/embeds/catan/play.html?v=2" title="Play the network" loading="lazy" allow="fullscreen" allowfullscreen style="width: min(1240px, 96vw); margin-left: calc(50% - min(620px, 48vw)); height: min(820px, 90vh); border: 0; display: block;"></iframe>
 
 ## Acknowledgements
  The fountain of ideas Arthi. The great just arbitrator Natalie. The witch of ML tools and Colonist ranked player of her own right Michelle. My temp manager who believed in me from the beginning Isabella. Intellectual discussion Dhruv. My first validators the Zhang sisters. <3
