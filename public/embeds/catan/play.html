@@ -88,14 +88,13 @@ button.mini { padding: 2px 8px; font-size: 12px; box-shadow: 2px 2px 0 var(--ink
 .bump { animation: bump var(--t2) var(--out); }
 @keyframes bump { 50% { transform: scale(1.18); } }
 
-/* What to do now, or what just happened: one tag, top centre. */
-#prompt { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); max-width: min(560px, calc(100% - 400px)); display: none;
-  background: var(--card); border: 2px solid var(--ink); box-shadow: var(--shadow); font-size: 13px; z-index: 3; }
-#prompt.show { display: block; }
-#prompt .main { display: flex; align-items: center; gap: 8px; padding: 6px 12px; }
+/* What to do now, or what just happened: in the strip across the top, so it never covers the board. */
+#prompt { display: none; background: var(--card); border: 2px solid var(--ink); box-shadow: var(--shadow); font-size: 13px; min-width: 0; }
+#prompt.show { display: flex; align-items: stretch; flex-wrap: wrap; }
+#prompt .main { display: flex; align-items: center; gap: 8px; padding: 5px 12px; font-weight: 600; }
 #prompt .chip { width: 10px; height: 10px; border: 1.5px solid var(--ink); flex: none; }
-#prompt .extra { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px 8px; }
-#prompt .hint { display: flex; align-items: center; gap: 8px; padding: 5px 12px; border-top: 2px solid var(--ink); background: var(--paper); font-size: 12px; }
+#prompt .extra { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 4px 12px 4px 0; }
+#prompt .hint { display: flex; align-items: center; gap: 8px; padding: 4px 12px; border-left: 2px solid var(--ink); background: var(--paper); font-size: 12px; }
 #prompt .hint b { font-weight: 700; }
 
 /* The table, a strip across the top: the dice on the left, the bank on the right. */
@@ -177,8 +176,8 @@ button.mini { padding: 2px 8px; font-size: 12px; box-shadow: 2px 2px 0 var(--ink
 .big-pick .chipr { width: 52px; height: 70px; }
 .big-pick .chipr svg { width: 26px; height: 26px; }
 
-/* The open offer, under the prompt. */
-#offer { position: absolute; top: 58px; left: 50%; transform: translateX(-50%); background: var(--card); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink);
+/* The open offer, at the top of the board. */
+#offer { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); background: var(--card); border: 2px solid var(--ink); box-shadow: 5px 5px 0 var(--ink);
   padding: 10px 12px; display: none; z-index: 3; min-width: 280px; }
 #offer.show { display: block; }
 #offer .deal { display: flex; align-items: center; gap: 10px; }
@@ -222,10 +221,43 @@ button.mini { padding: 2px 8px; font-size: 12px; box-shadow: 2px 2px 0 var(--ink
 #screen .loading::after { content: "▮"; animation: blink 1s steps(1) infinite; margin-left: 3px; }
 #screen .loading:empty::after { content: none; }
 @keyframes blink { 50% { opacity: 0; } }
-#screen .standings { margin: 10px 0 16px; }
-#screen .standings div { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--dot); }
-#screen .standings i { width: 12px; height: 12px; border: 1.5px solid var(--ink); }
-#screen .standings b { margin-left: auto; font-size: 16px; }
+/* End of game: where each player's points came from, and how the dice fell. */
+#screen .box.over { width: min(640px, 100%); max-height: calc(100% - 8px); overflow-y: auto; }
+#screen h3 { margin: 18px 0 8px; font-size: 13px; }
+#screen h3 small { font-weight: 400; color: var(--dim); margin-left: 6px; }
+.points { width: 100%; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
+.points thead th { font-size: 13px; font-weight: 700; text-align: center; padding: 0 6px 8px; white-space: nowrap; }
+.points thead th:first-child { width: 34%; }
+.points tbody th { text-align: left; font-weight: 600; padding: 7px 6px 7px 0; border-top: 1px solid var(--dot); }
+.points tbody th small { display: block; font-weight: 400; font-size: 11px; color: var(--dim); }
+.points td { text-align: center; padding: 7px 6px; border-top: 1px solid var(--dot); }
+.points td b { display: block; font-size: 15px; }
+.points td small { display: block; font-size: 10.5px; color: var(--dim); }
+.points td.zero { color: var(--rule); }
+.points .win { background: var(--paper); }
+.points tr.total th, .points tr.total td { border-top: 2px solid var(--ink); font-weight: 800; font-size: 17px; padding-top: 9px; }
+.points i { display: inline-block; width: 11px; height: 11px; border: 1.5px solid var(--ink); margin-right: 7px; vertical-align: -1px; }
+.dice { display: grid; grid-template-columns: repeat(11, 1fr); gap: 6px; align-items: end; height: 150px; padding-top: 4px; border-bottom: 2px solid var(--ink); }
+.dice .col { position: relative; height: 100%; }
+.dice .bar { position: absolute; left: 0; right: 0; bottom: 0; background: var(--ink); min-height: 2px; transform-origin: bottom; animation: grow var(--t4) var(--out) both; }
+.dice .bar.seven { background: #c0392b; }
+@keyframes grow { from { transform: scaleY(0); } }
+.dice .n { position: absolute; left: 0; right: 0; text-align: center; font: 700 11px system-ui; margin-bottom: 4px; }
+.dice .exp { position: absolute; left: -2px; right: -2px; border-top: 2px dashed var(--dim); pointer-events: none; }
+.dice-x { display: grid; grid-template-columns: repeat(11, 1fr); gap: 6px; text-align: center; font: 600 11.5px system-ui; padding-top: 4px; }
+.dice-note { font-size: 11.5px; color: var(--dim); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+.dice-note span { display: inline-block; width: 16px; border-top: 2px dashed var(--dim); }
+#screen .box.over > button { margin-top: 18px; }
+.wlegend { display: flex; gap: 14px; font-size: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+.wlegend span { display: flex; align-items: center; gap: 6px; }
+.key { display: inline-block; width: 14px; height: 0; border-top: 2.5px solid; }
+.wchart { position: relative; }
+.wchart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.wtip { position: absolute; top: 0; pointer-events: none; background: var(--card); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+  padding: 6px 9px; font-size: 12px; display: none; white-space: nowrap; z-index: 2; }
+.wtip .t { color: var(--dim); font-size: 11px; margin-bottom: 3px; }
+.wtip div { display: flex; align-items: center; gap: 7px; }
+.wtip b { min-width: 34px; text-align: right; }
 
 /* Things in flight. */
 #fly { position: fixed; inset: 0; pointer-events: none; z-index: 20; }
@@ -235,6 +267,13 @@ button.mini { padding: 2px 8px; font-size: 12px; box-shadow: 2px 2px 0 var(--ink
 .fc.back::after { content: ""; width: 10px; height: 10px; border: 2px solid var(--paper); transform: rotate(45deg); opacity: .6; }
 .fc.devc { background: var(--dev); }
 .fc.devc:empty::after { content: "?"; font: 800 15px system-ui; }
+/* A moment worth stopping for (a steal, whose turn it is now): one card in the middle of the board. */
+#announce { position: absolute; left: 50%; top: 44%; z-index: 7; display: none; pointer-events: none; transform: translate(-50%, -50%);
+  background: var(--card); border: 2px solid var(--ink); border-left: 12px solid var(--pc, var(--ink)); box-shadow: 5px 5px 0 var(--ink);
+  padding: 10px 20px 11px 16px; font: 700 18px system-ui; white-space: nowrap; }
+#announce small { display: block; font: 500 12.5px system-ui; color: var(--dim); margin-top: 2px; }
+.plate.robbed { animation: shake var(--t3) ease-in-out 2; }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 #show { position: absolute; left: 50%; top: 50%; z-index: 8; pointer-events: none; display: none; width: 132px; height: 180px; margin: -90px 0 0 -66px;
   background: var(--card); border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
 #show .band { position: absolute; top: 0; left: 0; right: 0; height: 18px; border-bottom: 2px solid var(--ink); }
@@ -269,7 +308,7 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
   .plate { position: relative; width: auto; left: auto !important; right: auto !important; top: auto !important; bottom: auto !important; }
   .plate.pos-0 { order: 3; }
   #board { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 1 / .95; order: 1; }
-  #prompt { position: relative; left: auto; top: auto; transform: none; max-width: none; margin: 8px 8px 0; order: 2; }
+  #prompt { order: 5; flex-basis: 100%; }
   #bank .lbl { display: none; }
   #offer, .tray { position: fixed; left: 8px; right: 8px; transform: none; min-width: 0; top: auto; bottom: 8px; animation: none; }
   #bottom { flex-wrap: wrap; }
@@ -305,16 +344,16 @@ svg text { font-family: system-ui, -apple-system, sans-serif; }
     <button class="icon mini" id="full" title="Full screen"><svg><use href="#i-full"/></svg></button>
   </div>
   <div id="table">
-    <div id="dice" class="old"><div class="die"></div><div class="die"></div></div><div id="rolled"></div><span class="grow"></span><div id="bank"></div>
+    <div id="dice" class="old"><div class="die"></div><div class="die"></div></div><div id="rolled"></div><span class="grow"></span><div id="prompt"></div><span class="grow"></span><div id="bank"></div>
   </div>
   <div id="forecast"></div>
   <div id="stage">
     <svg id="board"></svg>
     <div id="plates"></div>
-    <div id="prompt"></div>
     <div id="offer"></div>
     <div id="tray" class="tray"></div>
     <div id="show"></div>
+    <div id="announce"></div>
     <div id="log"><header>Log<button class="mini" id="logclose">Close</button></header><div class="list"></div></div>
   </div>
   <div id="bottom">
@@ -374,7 +413,7 @@ const el = (tag, attrs = {}, kids = []) => {
 const glyph = (name, attrs = {}) => el("svg:svg", { viewBox: "0 0 20 20", ...attrs }, [el("svg:use", { href: `#g-${name}` })]);
 const pt = ([x, y]) => [x * XS, y * YS];
 
-let rolled = null;
+let rolled = null, history = [];
 let session = null, view = null, disp = null, busy = false, gen = 0, current = null, hints = false;
 let mode = null, give = [0, 0, 0, 0, 0], get = [0, 0, 0, 0, 0], bankGive = null, bankGet = null, chosen = [0, 0, 0, 0, 0], dismissed = null, picks = [];
 const yours = () => view && !busy && view.toAct === view.human && view.winner == null;
@@ -425,11 +464,95 @@ async function chooseMode(name) {
   showStart(name, manifest.players);
 }
 function begin(seat) { $("screen").classList.remove("show"); newGame(seat); }
+// How the network's forecast of each player's chance of winning moved over the game, one line per player, ending
+// at the result. Lines end in labels (name and final chance) and hovering shows every player's chance at that turn.
+function winChart(points) {
+  const n = view.players, N = points.length, W = 600, H = 180, L = 36, Rt = 104, T = 8, B = 24;
+  const x = i => L + (N > 1 ? i / (N - 1) : 0) * (W - L - Rt), y = p => T + (1 - p) * (H - T - B);
+  const svg = el("svg:svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Chance of winning over the game" });
+  for (const p of [0, .5, 1]) {
+    svg.append(el("svg:line", { x1: L, x2: W - Rt, y1: y(p), y2: y(p), stroke: p ? "#dddbd4" : INK, "stroke-width": p ? 1 : 1.5 }));
+    svg.append(el("svg:text", { x: L - 6, y: y(p) + 3.5, "text-anchor": "end", "font-size": 10.5, fill: "#6f6d66", text: `${p * 100}%` }));
+  }
+  svg.append(el("svg:text", { x: L, y: H - 6, "font-size": 10.5, fill: "#6f6d66", text: "start" }));
+  svg.append(el("svg:text", { x: W - Rt, y: H - 6, "text-anchor": "end", "font-size": 10.5, fill: "#6f6d66", text: `end (${N - 1} rounds)` }));
+  const order = [...Array(n).keys()].sort((a, b) => (a === view.winner) - (b === view.winner));
+  for (const s of order) svg.append(el("svg:polyline", { points: points.map((f, i) => `${x(i)},${y(f[s])}`).join(" "), fill: "none",
+    stroke: COLOR(s), "stroke-width": 2.25, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  // End labels, nudged apart so equal finishes don't overlap.
+  const ends = [...Array(n).keys()].map(s => ({ s, y: y(points[N - 1][s]) })).sort((a, b) => a.y - b.y);
+  for (let i = 1; i < ends.length; i++) ends[i].y = Math.max(ends[i].y, ends[i - 1].y + 13);
+  const over = ends.length ? ends[ends.length - 1].y - (H - B + 4) : 0;
+  if (over > 0) ends.forEach(e => { e.y -= over; });
+  for (const e of ends) {
+    svg.append(el("svg:line", { x1: W - Rt + 6, x2: W - Rt + 18, y1: e.y, y2: e.y, stroke: COLOR(e.s), "stroke-width": 2.5 }));
+    svg.append(el("svg:text", { x: W - Rt + 23, y: e.y + 3.5, "font-size": 11, fill: INK, "font-weight": 600, text: `${who(e.s)} ${Math.round(100 * points[N - 1][e.s])}%` }));
+  }
+  const hair = el("svg:line", { y1: T, y2: H - B, stroke: INK, "stroke-width": 1, opacity: 0 });
+  const hit = el("svg:rect", { x: L, y: T, width: W - L - Rt, height: H - T - B, fill: "transparent" });
+  svg.append(hair, hit);
+  const tip = el("div", { class: "wtip" }), box = el("div", { class: "wchart" }, [svg, tip]);
+  hit.addEventListener("pointermove", e => {
+    const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    const i = Math.max(0, Math.min(N - 1, Math.round((p.x - L) / (W - L - Rt) * (N - 1))));
+    hair.setAttribute("x1", x(i)); hair.setAttribute("x2", x(i)); hair.setAttribute("opacity", .5);
+    tip.replaceChildren(el("div", { class: "t", text: i === N - 1 ? "Result" : `Round ${i + 1}` }),
+      ...[...Array(n).keys()].sort((a, b) => points[i][b] - points[i][a]).map(s => el("div", {}, [el("b", { text: `${Math.round(100 * points[i][s])}%` }),
+        el("span", { class: "key", style: `border-color:var(--p${s})` }), who(s)])));
+    tip.style.display = "block";
+    const left = x(i) / W * box.clientWidth;
+    tip.style.left = `${left + (left > box.clientWidth * .6 ? -tip.offsetWidth - 10 : 10)}px`;
+  });
+  hit.addEventListener("pointerleave", () => { tip.style.display = "none"; hair.setAttribute("opacity", 0); });
+  const legend = el("div", { class: "wlegend" }, [...Array(n).keys()].map(s => el("span", {}, [el("span", { class: "key", style: `border-color:var(--p${s})` }), who(s)])));
+  return [legend, box];
+}
+
+// The end of a game: each player's points by where they came from, and how often each number was rolled.
 function showOver() {
-  const final = session.finalPoints(), standings = view.seats.map(s => ({ ...s, points: final[s.seat] })).sort((a, b) => b.points - a.points);
-  $("screen").replaceChildren(el("div", { class: "box" }, [
-    el("h2", { text: view.winner === view.human ? "You won." : `${NAMES[view.winner]} won.` }),
-    el("div", { class: "standings" }, standings.map(s => el("div", {}, [el("i", { style: `background:var(--p${s.seat})` }), s.you ? `You (${s.name})` : s.name, el("b", { text: s.points })]))),
+  const final = session.finalPoints(), b = view.board;
+  const rows = view.seats.map(s => {
+    const settlements = b.settlements.filter(x => x.seat === s.seat).length, cities = b.cities.filter(x => x.seat === s.seat).length;
+    const road = s.longestRoad ? 2 : 0, army = s.largestArmy ? 2 : 0;
+    // Victory point cards are hidden during play; whatever the true total has beyond the visible sources is them.
+    const cards = Math.max(0, final[s.seat] - settlements - 2 * cities - road - army);
+    return { s, settlements, cities, road, army, cards, total: final[s.seat] };
+  }).sort((x, y) => y.total - x.total || (x.s.seat === view.winner ? -1 : 1));
+  // One row per source of points, one column per player. Each cell is the points, with what earned them underneath.
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const SOURCES = [
+    ["Settlements", "1 point each", r => [r.settlements, r.settlements && plural(r.settlements, "settlement", "settlements")]],
+    ["Cities", "2 points each", r => [2 * r.cities, r.cities && plural(r.cities, "city", "cities")]],
+    ["Longest road", "2 points", r => [r.road, r.road && "held"]],
+    ["Largest army", "2 points", r => [r.army, r.army && "held"]],
+    ["Victory point cards", "1 point each", r => [r.cards, r.cards && plural(r.cards, "card", "cards")]],
+  ];
+  const table = el("table", { class: "points" }, [
+    el("thead", {}, [el("tr", {}, [el("th"), ...rows.map(r => el("th", { class: r.s.seat === view.winner ? "win" : "" },
+      [el("i", { style: `background:var(--p${r.s.seat})` }), r.s.you ? "You" : r.s.name]))])]),
+    el("tbody", {}, [
+      ...SOURCES.map(([name, rule, get]) => el("tr", {}, [el("th", { scope: "row" }, [name, el("small", { text: rule })]),
+        ...rows.map(r => { const [points, what] = get(r);
+          return el("td", { class: (points ? "" : "zero") + (r.s.seat === view.winner ? " win" : "") }, points ? [el("b", { text: points }), el("small", { text: what })] : ["–"]); })])),
+      el("tr", { class: "total" }, [el("th", { scope: "row", text: "Total" }), ...rows.map(r => el("td", { class: r.s.seat === view.winner ? "win" : "", text: r.total }))]),
+    ]),
+  ]);
+  // Dice: one bar per sum, with a dashed mark where an average game would have put it.
+  const counts = session.rolls.slice(2), total = counts.reduce((a, c) => a + c, 0);
+  const expected = counts.map((_, i) => total * (6 - Math.abs(5 - i)) / 36), top = Math.max(1, ...counts, ...expected);
+  const dice = el("div", { class: "dice" }, counts.map((n, i) => el("div", { class: "col", title: `${i + 2}: rolled ${n} time${n === 1 ? "" : "s"} (about ${expected[i].toFixed(1)} expected)` }, [
+    el("div", { class: "bar" + (i === 5 ? " seven" : ""), style: `height:${(100 * n / top) * .86}%; animation-delay:${30 * i}ms` }),
+    el("div", { class: "n", text: n, style: `bottom:${(100 * Math.max(n, expected[i]) / top) * .86}%` }),
+    el("div", { class: "exp", style: `bottom:${(100 * expected[i] / top) * .86}%` }),
+  ])));
+  $("screen").replaceChildren(el("div", { class: "box over" }, [
+    el("h2", { text: view.winner === view.human ? `You won with ${final[view.winner]} points.` : `${NAMES[view.winner]} won with ${final[view.winner]} points.` }),
+    el("h3", { text: "Points" }), table,
+    ...(history.length > 1 ? [el("h3", {}, ["Chance of winning", el("small", { text: "the network's forecast from your seat, at the start of each of your turns" })]),
+      ...winChart([...history, view.seats.map((_, s) => s === view.winner ? 1 : 0)])] : []),
+    el("h3", {}, ["Dice", el("small", { text: `${total} rolls` })]), dice,
+    el("div", { class: "dice-x" }, counts.map((_, i) => el("span", { text: i + 2 }))),
+    el("div", { class: "dice-note" }, [el("span"), "expected for this many rolls"]),
     el("button", { class: "primary", text: "Play again", on: { click: () => showStart(current, session.config.players) } }),
   ]));
   $("screen").classList.add("show");
@@ -839,7 +962,7 @@ const slotOf = (seat, r) => seat === view.human && r != null ? $("hand").childre
 const bankSlot = r => r == null ? $("bank").querySelector(".deck") : $("bank").querySelector(`[data-res="${r}"]`);
 function bumpNode(node) { if (!node) return; node.classList.remove("bump"); void node.offsetWidth; node.classList.add("bump"); }
 // One card along an arc from a point to an element; `land` runs as it arrives (to update the counts it lands on).
-async function fly(from, toNode, { res = null, back = false, dev = false, delay = 0, land = null } = {}) {
+async function fly(from, toNode, { res = null, back = false, dev = false, delay = 0, land = null, ms = 460, big = false } = {}) {
   if (!toNode) { land && land(); return; }
   const card = el("div", { class: "fc" + (back ? " back" : dev ? " devc" : ""), style: res != null && !back ? `background:var(--${RES[res]})` : "" },
     res != null && !back ? [glyph(RES[res])] : dev && dev !== true ? [glyph(dev)] : []);
@@ -849,10 +972,10 @@ async function fly(from, toNode, { res = null, back = false, dev = false, delay 
   for (let i = 0; i <= 12; i++) {
     const t = i / 12, e = t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
     const x = x0 + (x1 - x0) * e, y = y0 + (y1 - y0) * e - lift * 4 * e * (1 - e);
-    frames.push({ transform: `translate(${x - 13}px, ${y - 18}px) rotate(${(1 - e) * -8}deg) scale(${1 + .15 * 4 * e * (1 - e)})`, opacity: t === 0 ? 0 : 1, offset: t });
+    frames.push({ transform: `translate(${x - 13}px, ${y - 18}px) rotate(${(1 - e) * -8}deg) scale(${(big ? 1.5 : 1) + .15 * 4 * e * (1 - e)})`, opacity: t === 0 ? 0 : 1, offset: t });
   }
   frames[1].opacity = 1;
-  await anim(card, frames, 460, "linear", { delay: T(delay) });
+  await anim(card, frames, ms, "linear", { delay: T(delay) });
   card.remove();
   land && land();
   bumpNode(toNode);
@@ -867,7 +990,7 @@ async function rollDice(sum) {
   const a = Math.max(1, sum - 6) + Math.floor(Math.random() * (Math.min(6, sum - 1) - Math.max(1, sum - 6) + 1)), faces = [a, sum - a];
   if (reduced) { dice.forEach((d, i) => face(d, faces[i])); return; }
   let flick = setInterval(() => dice.forEach(d => face(d, 1 + Math.floor(Math.random() * 6))), T(70));
-  await Promise.all(dice.map((d, i) => anim(d, [{ transform: "translateY(-22px) rotate(-200deg)" }, { transform: `translateY(-30px) rotate(${-90 + i * 30}deg)`, offset: .45 },
+  await Promise.all(dice.map((d, i) => anim(d, [{ transform: "translateY(-6px) rotate(-200deg)" }, { transform: `translateY(-10px) rotate(${-90 + i * 30}deg)`, offset: .45 },
     { transform: "translateY(0) rotate(0) scale(1.12, .85)", offset: .85 }, { transform: "none" }], 520, "ease-out", { delay: i * 50 })));
   clearInterval(flick);
   dice.forEach((d, i) => face(d, faces[i]));
@@ -932,6 +1055,16 @@ async function moveRobber(h) {
   placeRobber(h); scene.robber.getAnimations().forEach(a => a.cancel());
   await anim(body, [{ transform: "translateY(-6px)" }, { transform: "scale(1.2, .75)", offset: .5 }, { transform: "none" }], 200, "ease-out");
 }
+async function announce(seat, text, sub = null, hold = 700) {
+  const box = $("announce");
+  box.style.setProperty("--pc", seat == null ? "var(--ink)" : `var(--p${seat})`);
+  box.replaceChildren(text, ...(sub ? [el("small", { text: sub })] : []));
+  box.style.display = "block";
+  await anim(box, [{ opacity: 0, transform: "translate(-50%, -30%) scale(.96)" }, { opacity: 1, transform: "translate(-50%, -50%)" }], 220);
+  await sleep(T(hold));
+  await anim(box, [{ opacity: 1, transform: "translate(-50%, -50%)" }, { opacity: 0, transform: "translate(-50%, -60%)" }], 160, IN);
+  box.style.display = "none"; box.getAnimations().forEach(a => a.cancel());
+}
 async function showcase(seat, card) {
   const box = $("show");
   box.replaceChildren(el("div", { class: "band", style: `background:var(--p${seat})` }), glyph(card.replace(/ /g, "-")), el("b", { text: DEV_TITLE[card] }), el("small", { text: `${who(seat)} played it` }));
@@ -952,8 +1085,15 @@ async function play(f, before, after) {
     case "build": if (!f.free) await spend(f.seat, COST[f.kind], f.seat !== human); await drop(f.kind, f.at, f.seat); break;
     case "robber": await moveRobber(f.hex); break;
     case "steal": {
+      // A steal is easy to miss, so it gets its own moment: who took from whom (and what, if you were part of it),
+      // the victim's seat shakes, and the card crosses slowly.
+      const what = f.res != null ? `1 ${RES[f.res]}` : "a card", victim = f.from === human ? "you" : NAMES[f.from];
+      const said = announce(f.to, `${who(f.to)} stole ${what} from ${victim}`, f.res == null ? "Only the two of them know which card" : null, 900);
+      await sleep(T(200));
       const from = centre(slotOf(f.from, f.res)); addCards(f.from, f.res, -1); redrawCounts();
-      await fly(from, slotOf(f.to, f.res), { res: f.res, back: f.res == null, land: () => { addCards(f.to, f.res, 1); redrawCounts(); } });
+      plateOf(f.from)?.classList.add("robbed");
+      await fly(from, slotOf(f.to, f.res), { res: f.res, back: f.res == null, ms: 820, big: true, land: () => { addCards(f.to, f.res, 1); redrawCounts(); } });
+      await said;
       break;
     }
     case "buy": await spend(f.seat, COST.card, f.seat !== human);
@@ -1007,16 +1147,32 @@ async function advance(mutate) {
   // The offer board changes with no effect to play: show it straight away so answers appear as they come.
   view = { ...before, offerBoard: after.offerBoard, events: after.events, toAct: before.toAct };
   drawOffer(); drawPlates(); drawLog(); drawPrompt();
-  for (const f of fx) { if (g !== gen) return; await play(f, before, after); }
+  // Whose turn it is gets announced as it changes hands: just before the new player's roll, or at the end if the turn
+  // passed without one. (The engine passes a turn by itself when ending it is the only move, so this follows the state.)
+  let cur = before.current;
+  const handOff = async seat => {
+    const sub = before.phase.startsWith("place") ? "Setup is over" : `${who(cur)} ended ${cur === view.human ? "your" : "their"} turn`;
+    cur = seat;
+    await announce(seat, seat === view.human ? "Your turn" : `${NAMES[seat]}'s turn`, sub, 650);
+  };
+  for (const f of fx) {
+    if (g !== gen) return;
+    if (f.type === "roll" && f.seat !== cur) await handOff(f.seat);
+    await play(f, before, after);
+  }
   if (g !== gen) return;
+  if (after.current !== cur && after.winner == null && !after.phase.startsWith("place")) await handOff(after.current);
   view = after; disp = copy(after);
+  // The network's forecast once per turn, for the chart at the end of the game.
+  const f = view.insight && view.insight.forecast;
+  if (f && !after.phase.startsWith("place") && after.current === view.human && (!history.length || before.current !== view.human)) history.push(f.slice());
   syncBoard(view);
   busy = false;
   if (after.current !== before.current && !fx.some(f => f.type === "roll")) $("dice").classList.add("old");
   render();
   if (view.winner != null) { await sleep(T(600)); if (g === gen) showOver(); return; }
-  // A beat when the turn passes, so one player's turn doesn't run straight into the next.
-  if (after.current !== before.current) await sleep(T(450));
+  // A beat when the turn passes during setup, where there's no announcement.
+  if (after.current !== before.current && after.phase.startsWith("place")) await sleep(T(450));
 }
 async function act(code, deal, many) {
   if (busy || !yours()) return;
@@ -1028,7 +1184,7 @@ async function runNetwork() {
   const g = gen;
   while (g === gen && view && view.winner == null && view.toAct != null && view.toAct !== view.human) {
     drawPlates();
-    await sleep(T(380));
+    await sleep(T(550));
     if (g !== gen) return;
     await advance(() => session.step());
   }
@@ -1039,7 +1195,7 @@ function newGame(seat) {
   $("fly").replaceChildren();
   session.new(undefined, seat ?? undefined); session.drain();
   view = session.view(); disp = copy(view);
-  mode = null; dismissed = null; chosen = [0, 0, 0, 0, 0]; rolled = null;
+  mode = null; dismissed = null; chosen = [0, 0, 0, 0, 0]; rolled = null; history = [];
   [...$("dice").children].forEach(d => face(d, 1)); $("dice").classList.add("old");
   buildBoard(); render();
   runNetwork();

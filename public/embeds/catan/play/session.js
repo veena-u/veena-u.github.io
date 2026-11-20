@@ -39,6 +39,8 @@ export class Session {
     this.placed = Array(this.config.players).fill(0);
     // What happened, as typed effects for the page to animate in order (the events above are the same story in words).
     this.fx = [];
+    // How often each sum (2 to 12) came up, for the end-of-game summary.
+    this.rolls = Array(13).fill(0);
   }
 
   drain() { const fx = this.fx; this.fx = []; return fx; }
@@ -170,7 +172,7 @@ export class Session {
     const n = this.config.players;
     if (actor < 0) {
       const mover = this.mover;
-      if (PHASES[phase] === "dice") { this.fx.push({ type: "roll", seat: mover, sum: code + 2 }); this.collect(code + 2, index); return `rolled ${code + 2}`; }
+      if (PHASES[phase] === "dice") { this.rolls[code + 2] += 1; this.fx.push({ type: "roll", seat: mover, sum: code + 2 }); this.collect(code + 2, index); return `rolled ${code + 2}`; }
       if (PHASES[phase] === "steal") {
         let victim = this.victim;
         if (victim === null && n === 2) victim = 1 - mover;
