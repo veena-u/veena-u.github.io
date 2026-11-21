@@ -193,5 +193,12 @@ Searching ahead does help at play time: a player that searches before every move
 
 <iframe src="/embeds/catan/play.html?v=2" title="Play the network" loading="lazy" allow="fullscreen" allowfullscreen style="width: min(1240px, 96vw); margin-left: calc(50% - min(620px, 48vw)); height: min(820px, 90vh); border: 0; display: block;"></iframe>
 
-## Acknowledgements
- The fountain of ideas Arthi. The great just arbitrator Natalie. The witch of ML tools and Colonist ranked player of her own right Michelle. My temp manager who believed in me from the beginning Isabella. Intellectual discussion Dhruv. My first validators the Zhang sisters. <3
+## What to improve
+
+Playing the network against other bots online showed that the board holds up, but trading does not. The trading style is brutish, proposing up to 6 offers at once, and repeatedly runs the same trade offers each turn. If a player accepts the trade, it may even choose to back out and it almost never accepts counter offers. 
+
+Trading is a nuanced part of Catan, but some hypotheses on why this could have cultivated: The only reward is winning, so an offer costs the network nothing except one of the 15 moves it gets per turn. A pointless offer is effectively unpunished. Also in training, its opponents were copies of itself and one fixed scripted bot, so every opponent answered the same way for the whole game.
+
+To improve this, we ould add a small penalty per offer to encourage only proposals which the network thinks are likely to be accepted. We can also vary the opponents during training to include ones that trade. 
+
+Other issues are that it cannot team up with another player via a communication channel, this would require some natural language capabilities which could be interesting to explore, since actual Catan has quite a lot of talking and compromising. 
